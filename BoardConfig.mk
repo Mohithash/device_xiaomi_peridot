@@ -180,6 +180,9 @@ TARGET_KERNEL_EXT_MODULES := \
     nxp/opensource/driver
 
 # Partitions
+ifneq ($(WITH_GMS),true)
+BOARD_PRODUCTIMAGE_PARTITION_RESERVED_SIZE := 838860800
+endif
 -include vendor/lineage/config/BoardConfigReservedSize.mk
 
 BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
