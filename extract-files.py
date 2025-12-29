@@ -318,6 +318,16 @@ blob_fixups: blob_fixups_user_type = {
             'libaudioroute.so',
             'libaudioroute-v34.so'
     ),
+    'vendor/etc/init/nicmd.rc': blob_fixup()
+        .regex_replace(
+            r'(service\s+vendor\.nicmd\s+/system/vendor/bin/nicmd\s*\n\s*class\s+main)',
+            r'\1\n    user root\n    group root'
+    ),
+    'vendor/etc/init/vendor.dpmd.rc': blob_fixup()
+        .regex_replace(
+            r'(service\s+vendor\.dpmd\s+/vendor/bin/vendor\.dpmd\s*\n)',
+            r'\1    user root\n'
+    ),
     'vendor/etc/clstc_config_library.xml': blob_fixup()
         .regex_replace(r'<library>\s*<name>libdolbyclstc[\s\S]*?</library>', ''),
     'vendor/etc/seccomp_policy/c2audio.vendor.ext-arm64.policy': blob_fixup()
