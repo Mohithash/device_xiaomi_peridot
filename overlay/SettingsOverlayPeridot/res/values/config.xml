@@ -13,7 +13,7 @@
          otherwise a slider. If '3', the settings app maps intensities directly to the levels
          supported by the Vibrator HAL APIs. If '2', then the levels will be mapped to
          VIBRATION_INTENSITY_LOW and VIBRATION_INTENSITY_HIGH, which gives the most range for
-         scaling vibrations. The medium intensity will be skipped.
+u         scaling vibrations. The medium intensity will be skipped.
 
          The default intensity values are configured at
          frameworks/base/core/res/res/values/config.xml's config_default[type]VibrationIntensity.
