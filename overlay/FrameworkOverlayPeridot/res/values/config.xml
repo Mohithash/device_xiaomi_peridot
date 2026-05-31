@@ -901,6 +901,6 @@
     <!-- Improve Signal reception -->
     <bool name="config_ignoreRssnrSignalLevel">true</bool>
 
-    <!-- Status Bar Burn-In Protection -->
-    <bool name="config_enableBurnInProtection">true</bool>
+    <!-- If not zero, limits the internal screen recorder's framerate to the set value. -->
+    <integer name="config_screenRecorderMaxFramerate">120</integer>
 </resources>
