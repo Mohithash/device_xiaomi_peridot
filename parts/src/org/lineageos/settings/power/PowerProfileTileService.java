@@ -228,9 +228,9 @@ public class PowerProfileTileService extends TileService {
 
         boolean isCharging = isCharging();
 
-        // Handle HTSR for PERFORMANCE profile
-        boolean htsrEnabled = profile == PowerProfile.PERFORMANCE || profile == PowerProfile.GAMING;
-        updateTouchSamplingState(htsrEnabled);
+        // Don't Handle HTSR for PERFORMANCE or GAMING profile
+        // boolean htsrEnabled = profile == PowerProfile.PERFORMANCE || profile == PowerProfile.GAMING;
+        // updateTouchSamplingState(htsrEnabled);
 
         switch (profile) {
             case BATTERY:
