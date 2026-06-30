@@ -318,6 +318,14 @@ blob_fixups: blob_fixups_user_type = {
             'libaudioroute.so',
             'libaudioroute-v34.so'
     ),
+    (
+        'odm/lib64/libmiSensorCtrl.so',
+        'odm/lib64/librhytheyecare.so',
+    ): blob_fixup()
+        .replace_needed(
+            'android.hardware.sensors-V2-ndk.so',
+            'android.hardware.sensors-V3-ndk.so'
+    ),
     'vendor/etc/init/nicmd.rc': blob_fixup()
         .regex_replace(
             r'(service\s+vendor\.nicmd\s+/system/vendor/bin/nicmd\s*\n\s*class\s+main)',
