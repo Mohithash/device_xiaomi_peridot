@@ -105,4 +105,30 @@
         <item>5000</item>
     </string-array>
 
+    <!-- Charge mode -->
+    <string-array name="charge_mode_entries">
+        <item>@string/charge_mode_ok</item>
+        <item>@string/charge_mode_cool</item>
+        <item>@string/charge_mode_nuke</item>
+    </string-array>
+    <string-array name="charge_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <!-- Power profile. Values must match PowerProfileTileService.PowerProfile#getValue() -->
+    <string-array name="power_profile_entries">
+        <item>@string/powerprofile_default</item>
+        <item>@string/powerprofile_battery</item>
+        <item>@string/powerprofile_performance</item>
+        <item>@string/powerprofile_gaming</item>
+    </string-array>
+    <string-array name="power_profile_values">
+        <item>0</item>
+        <item>1</item>
+        <item>6</item>
+        <item>18</item>
+    </string-array>
+
 </resources>

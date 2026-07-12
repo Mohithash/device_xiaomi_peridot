@@ -56,4 +56,24 @@
             android:targetClass="org.lineageos.settings.touchsampling.TouchSamplingSettingsActivity" />
     </Preference>
 
+    <Preference
+        android:key="entry_power_profile"
+        android:title="@string/powerprofile_title"
+        android:summary="@string/powerprofile_summary"
+        android:icon="@drawable/ic_power_default">
+        <intent
+            android:targetPackage="org.lineageos.settings"
+            android:targetClass="org.lineageos.settings.power.PowerProfileActivity" />
+    </Preference>
+
+    <Preference
+        android:key="entry_charge"
+        android:title="@string/charge_tile_title"
+        android:summary="@string/charge_summary"
+        android:icon="@drawable/ic_charge_nuke">
+        <intent
+            android:targetPackage="org.lineageos.settings"
+            android:targetClass="org.lineageos.settings.charge.ChargeActivity" />
+    </Preference>
+
 </PreferenceScreen>

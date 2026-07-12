@@ -33,10 +33,12 @@
     <string name="powerprofile_gaming">Gaming Mode</string>
     <string name="powerprofile_battery">Battery Saver</string>
     <string name="powerprofile_unknown">Unknown</string>
+    <string name="powerprofile_summary">Choose a system performance profile</string>
 
      <!-- Performance Mode Notification -->
      <string name="perf_mode_title">Performance Mode</string>
      <string name="perf_mode_notification">Performance mode is active. Tap to open settings.</string>
+     <string name="gaming_mode_notification">Gaming mode is active. Tap to open settings.</string>
 
      <!-- Tile Disabled -->
      <string name="power_tile_disabled_subtitle">Disabled</string>
@@ -85,6 +87,7 @@
 
     <!-- Charge Control -->
     <string name="charge_tile_title">Charge Control</string>
+    <string name="charge_summary">Limit charging current to reduce heat and battery wear</string>
     <string name="charge_mode_ok">OK</string>
     <string name="charge_mode_cool">Cool</string>
     <string name="charge_mode_nuke">Nuke</string>

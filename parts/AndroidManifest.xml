@@ -233,6 +233,20 @@
             </intent-filter>
         </activity>
 
+        <!-- Charge mode settings screen -->
+        <activity
+            android:name=".charge.ChargeActivity"
+            android:label="@string/charge_tile_title"
+            android:theme="@style/Theme.SubSettingsBase"
+            android:exported="false" />
+
+        <!-- Power profile settings screen -->
+        <activity
+            android:name=".power.PowerProfileActivity"
+            android:label="@string/powerprofile_title"
+            android:theme="@style/Theme.SubSettingsBase"
+            android:exported="false" />
+
         <!-- Charging Tile Service -->
         <service
             android:name=".charge.ChargeTileService"
