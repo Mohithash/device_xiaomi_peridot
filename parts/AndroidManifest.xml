@@ -220,6 +220,19 @@
              </intent-filter>
          </activity>
 
+        <!-- App drawer launcher entry point -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_title"
+            android:icon="@drawable/ic_launcher_xiaomiparts"
+            android:exported="true"
+            android:theme="@style/Theme.SubSettingsBase">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <!-- Charging Tile Service -->
         <service
             android:name=".charge.ChargeTileService"
