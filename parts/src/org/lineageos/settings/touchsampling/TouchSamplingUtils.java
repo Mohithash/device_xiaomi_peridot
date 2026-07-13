@@ -41,24 +41,26 @@ public final class TouchSamplingUtils {
         writeTouchSamplingState(htsrState ? 1 : 0);
     }
 
+    // bump_sample_rate is a write-only trigger node on this driver — there is no
+    // readable counterpart (unlike e.g. gesture_double_tap_enabled/_state). Reading
+    // it always fails with EINVAL, so we track the last value we wrote ourselves
+    // instead of asking the kernel to report state it was never built to report.
+    private static volatile int sLastWrittenState = -1; // -1 = unknown, not yet written this session
+
     public static boolean writeTouchSamplingState(int state) {
         boolean success = FileUtils.writeOneLine(HTSR_FILE, String.valueOf(state));
         if (!success) {
             Log.e(TAG, "Failed to write touch sampling state: " + state);
+        } else {
+            sLastWrittenState = state;
         }
         return success;
     }
 
     public static int readTouchSamplingState() {
-        String currentState = FileUtils.readOneLine(HTSR_FILE);
-        if (currentState != null) {
-            try {
-                return Integer.parseInt(currentState.trim());
-            } catch (NumberFormatException e) {
-                Log.e(TAG, "Invalid touch sampling state format: " + currentState);
-            }
-        }
-        return 0; // Default to disabled
+        // No kernel read here on purpose — see sLastWrittenState comment above.
+        // Default to disabled (0) until we've actually written a state this session.
+        return sLastWrittenState == -1 ? 0 : sLastWrittenState;
     }
 
     // Per-app HTSR methods
