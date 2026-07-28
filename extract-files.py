@@ -314,6 +314,10 @@ blob_fixups: blob_fixups_user_type = {
         .clear_symbol_version('AHardwareBuffer_unlock'),
     'odm/lib64/libsnpe_config.so': blob_fixup()
         .add_needed('liblog.so'),
+    'odm/lib64/anc.hal.so': blob_fixup()
+        .add_needed('libion.so'),
+    'vendor/bin/qseecom_sample_client': blob_fixup()
+        .add_needed('libion.so'),
     (
         'odm/lib64/libaudioroute_ext.so',
         'vendor/lib64/libagm.so',
