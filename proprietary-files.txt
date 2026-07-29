@@ -165,6 +165,7 @@ vendor/lib64/soundfx/libspatializer.so
 vendor/lib64/soundfx/libswgamedap.so
 vendor/lib64/soundfx/libswspatializer.so
 vendor/lib64/soundfx/libswvqe.so
+vendor/lib64/soundfx/libshoebox.so
 
 # Bluetooth
 vendor/bin/hw/android.hardware.bluetooth@1.1-service-qti
