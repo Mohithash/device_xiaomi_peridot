@@ -153,7 +153,6 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/dolby/dax-default-spatializer.xml:$(TARGET_COPY_OUT_VENDOR)/etc/dolby/dax-default-spatializer.xml \
 
 PRODUCT_PACKAGES += \
-    DolbyAtmos
 
 # DRM
 PRODUCT_PACKAGES += \
@@ -556,3 +555,4 @@ $(call inherit-product, packages/apps/GameBar/gamebar.mk)
 
 # Vendor MiuiCamera
 $(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
+

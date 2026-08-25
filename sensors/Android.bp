@@ -28,6 +28,7 @@ cc_binary {
     ],
 
     header_libs: [
+        "qti_display_kernel_headers",
         "generated_kernel_headers",
     ],
 }
