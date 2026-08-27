@@ -9,12 +9,16 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
 # Inherit some common Lineage stuff.
-$(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+# BestROM: ultra-minimal - common_mobile (essentials) + telephony instead of
+# common_full_phone, which also drags in Camelot/Etar/Profiles/Recorder/
+# Seedvault/Twelve/AudioFX/unrar/Google-Sans fonts.
+$(call inherit-product, vendor/lineage/config/common_mobile.mk)
+$(call inherit-product, vendor/lineage/config/telephony.mk)
 
 # Inherit from peridot device
 $(call inherit-product, device/xiaomi/peridot/device.mk)
 
-PRODUCT_NAME := lineage_peridot
+PRODUCT_NAME := bestrom_peridot
 PRODUCT_DEVICE := peridot
 PRODUCT_MANUFACTURER := Xiaomi
 PRODUCT_BRAND := POCO
@@ -23,10 +27,37 @@ PRODUCT_MODEL := 24069PC21G
 PRODUCT_SYSTEM_NAME := peridot_global
 PRODUCT_SYSTEM_DEVICE := peridot
 
+# BestROM: this block is currently DEAD CODE. PRODUCT_BUILD_PROP_OVERRIDES is
+# not registered in build/make/core/product.mk and is never exported into any
+# soong json by build/make/core/soong_config.mk or soong_extra_config.mk, so
+# override_config() in build/soong/scripts/gen_build_prop.py:50-64 never sees
+# it. Verified in the built ROM: out/target/product/peridot/system/build.prop:29
+# still reads
+# ro.build.fingerprint=POCO/lineage_peridot/peridot:17/CP2A.260605.016/eng.sal:userdebug/test-keys.
+# Gate it to user builds so that if the plumbing is ever restored it cannot
+# stamp a "user/release-keys" fingerprint (and an Android-16 BuildDesc) onto an
+# Android-17 userdebug/test-keys ROM. ro.build.type/ro.build.tags contradicting
+# ro.build.fingerprint is a stronger tell than an honest userdebug fingerprint.
+ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_BUILD_PROP_OVERRIDES += \
     BuildDesc="peridot_global-user 16 BP2A.250605.031.A3 OS3.0.302.0.WNPMIXM release-keys" \
     BuildFingerprint=POCO/peridot_global/peridot:16/BP2A.250605.031.A3/OS3.0.302.0.WNPMIXM:user/release-keys \
     DeviceName=$(PRODUCT_SYSTEM_DEVICE) \
     DeviceProduct=$(PRODUCT_SYSTEM_NAME)
+endif
 
 PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
+
+# BestROM: the old PRODUCT_PACKAGES filter-out line lived here and NEVER
+# WORKED. inherit-product defers its nodes, so at this point PRODUCT_PACKAGES
+# holds only inherit markers and filter-out matches none of the real package
+# names. Proof from the shipped build: DeviceAsWebcam, PrintSpooler and
+# ThemePicker were all named in it and all three APKs shipped anyway.
+# Packages contributed by inherited makefiles are removed instead via the
+# RemovePackagesPeridot "overrides:" list in
+# device/xiaomi/peridot/debloat/Android.bp. Add new removals THERE.
+
+# BestROM branding
+PRODUCT_PRODUCT_PROPERTIES += \
+    ro.bestrom.version=1.0-a17 \
+    ro.bestrom.device=peridot

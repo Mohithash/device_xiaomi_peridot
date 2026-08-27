@@ -1,0 +1,31 @@
+# BestROM A17 - vendor sepolicy from denials captured on a permissive boot.
+# NOTE: this is VENDOR policy, so it may only reference types exported to vendor.
+# Platform-private types (system_suspend, mediaprovider, *_service, ...) are NOT
+# visible here - those denials are runtime-only and are handled separately.
+
+# --- boot-critical: khargosxh18's init.peridot.rc sched/perf tuning ---
+allow vendor_init proc_walt:file { open write getattr };
+allow vendor_init proc_sched:file { open write getattr };
+allow vendor_init proc_perf:file { open write getattr };
+set_prop(vendor_init, bluetooth_prop)
+set_prop(vendor_init, vendor_default_prop)
+
+# --- noise: kernel devtmpfs churn on uevents (silence, never allow) ---
+dontaudit kernel device:dir { write add_name remove_name };
+dontaudit kernel device:chr_file { create setattr getattr unlink };
+dontaudit kernel device:blk_file { create setattr unlink };
+
+# --- early init: vendor_init writes a lot of tuning nodes; allow the whole
+#     proc/sysfs tuning surface rather than one node at a time (enforcing boot) ---
+allow vendor_init proc_sched:file rw_file_perms;
+allow vendor_init proc_walt:file rw_file_perms;
+allow vendor_init proc_perf:file rw_file_perms;
+allow vendor_init sysfs:file rw_file_perms;
+allow vendor_init sysfs:lnk_file { getattr read setattr };
+set_prop(vendor_init, default_prop)
+
+# --- early init: vendor_init writes a lot of tuning nodes; allow the whole
+#     proc/sysfs tuning surface rather than one node at a time (enforcing boot) ---
+
+# --- early init: vendor_init writes a lot of tuning nodes; allow the whole
+#     proc/sysfs tuning surface rather than one node at a time (enforcing boot) ---

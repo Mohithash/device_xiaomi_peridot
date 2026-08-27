@@ -68,6 +68,18 @@ TARGET_NO_BOOTLOADER := true
 # Display
 TARGET_SCREEN_DENSITY := 480
 
+# Bootanimation canvas. The peridot panel is 1220x2712 (see kernel dsi-panel-n16t-*-dsc-vid.dtsi).
+# Without these, vendor/lineage/config/common.mk:137-138 defaults to 1080x1920 and the generated
+# animation comes out 1080x360 instead of 1220x406.
+TARGET_SCREEN_WIDTH := 1220
+TARGET_SCREEN_HEIGHT := 2712
+
+# BestROM prebuilt boot animation. Path is relative to the TOP OF THE TREE: the genrule in
+# vendor/lineage/bootanimation/Android.bp does a raw "cp ../../../../../<path>" from its sbox dir
+# (out/soong/.temp/sbox/<hash>). The zip is BestROM's 1440x2560 15fps animation, copied from the A16
+# tree at vendor/voltage/bootanimation/2560.zip. Setting this bypasses gen-bootanimation.sh entirely.
+TARGET_BOOTANIMATION := device/xiaomi/peridot/prebuilt/bootanimation/bootanimation.zip
+
 # Filesystem
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/configs/config.fs
 
