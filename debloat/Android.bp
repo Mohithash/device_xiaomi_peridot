@@ -6,8 +6,8 @@ cc_prebuilt_binary {
         none: true,
     },
     overrides: [
+        "Camera2",
         "AmbientSensePrebuilt",
-        "Aperture",
         "arcore",
         "Chrome",
         "Chrome-Stub",
@@ -33,12 +33,30 @@ cc_prebuilt_binary {
         "SoundAmplifierPrebuilt",
         "SprintDM",
         "SprintHM",
+        "Traceur",
         "Tycho",
+        "Updater",
         "USCCDM",
         "VZWAPNLib",
         "Via",
         "Videos",
         "VzwOmaTrigger",
         "obdm_stub",
+
+        // BestROM ultra-minimal. These were listed in the (non-functional)
+        // filter-out in lineage_peridot.mk and are actually removed here.
+        // Mechanism proof: Traceur (handheld_system.mk:74) is in this list and
+        // is absent from installed-files, while BasicDreams/BookmarkProvider/
+        // CaptivePortalLogin from the same makefile are not listed and ship.
+        "AvatarPicker",
+        "BuiltInPrintService",
+        "DeviceAsWebcam",
+        "DeviceDiagnostics",
+        "EmergencyInfo",
+        "PrintRecommendationService",
+        "PrintSpooler",
+        "QuickSearchBox",
+        "SimAppDialog",
+        "WfdService",
     ],
 }

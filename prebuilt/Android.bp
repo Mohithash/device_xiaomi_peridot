@@ -1,0 +1,4 @@
+// BestROM prebuilt apps.
+// Freezer ships no native libs (verified), so android_app_import is safe here -
+// presigned APKs that DO carry compressed lib/*.so cannot be baked into a
+// system partition; those must be adb-installed instead.

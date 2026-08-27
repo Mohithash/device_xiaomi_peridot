@@ -208,7 +208,7 @@ PRODUCT_PACKAGES += \
 
 # IR
 PRODUCT_PACKAGES += \
-    android.hardware.ir-service.lineage
+    android.hardware.ir-service.ext
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.consumerir.xml:$(TARGET_COPY_OUT_ODM)/etc/permissions/android.hardware.consumerir.xml
@@ -266,7 +266,7 @@ PRODUCT_COPY_FILES += \
 
 # Lineage Health
 PRODUCT_PACKAGES += \
-    vendor.lineage.health-service.default
+    vendor.ext.health-service.default
 
 $(call soong_config_set_bool,lineage_health,charging_control_supports_bypass,false)
 $(call soong_config_set,lineage_health,fast_charge_node,/sys/class/qcom-battery/fastcharge_enable)
@@ -274,9 +274,7 @@ $(call soong_config_set,lineage_health,fast_charge_value_none,0)
 $(call soong_config_set,lineage_health,fast_charge_value_fast_charge,1)
 $(call soong_config_set,lineage_health,fast_charge_value_super_fast_charge,2)
 
-#Xiaomi Parts
-PRODUCT_PACKAGES += \
-    XiaomiParts
+# BestROM: XiaomiParts (org.lineageos.settings) removed - ultra-minimal build.
 
 # Dexopt
 PRODUCT_SYSTEM_PROPERTIES += \
@@ -347,10 +345,8 @@ PRODUCT_COPY_FILES += \
 
 # Overlays
 PRODUCT_PACKAGES += \
-    ApertureOverlayPeridot \
     CarrierConfigOverlayPeridot \
     FrameworkOverlayPeridot \
-    LineageSDKOverlayPeridot \
     LineageSettingsOverlayPeridot \
     NfcOverlayPeridot \
     SecureElementOverlayPeridot \
@@ -377,7 +373,7 @@ PRODUCT_PACKAGES += \
 
 # Power
 PRODUCT_PACKAGES += \
-    android.hardware.power-service.lineage-libperfmgr \
+    android.hardware.power-service.libperfmgr \
     libqti-perfd-client
 
 PRODUCT_COPY_FILES += \
@@ -474,7 +470,7 @@ PRODUCT_COPY_FILES += \
 
 # Touchscreen
 PRODUCT_PACKAGES += \
-    vendor.lineage.touch-service.xiaomi
+    vendor.ext.touch-service.xiaomi
 
 $(call soong_config_set, XIAOMI_TOUCH, HIGH_TOUCH_POLLING_PATH, /sys/devices/virtual/touch/touch_dev/bump_sample_rate)
 
@@ -549,10 +545,12 @@ PRODUCT_COPY_FILES += \
 
 # Vendor
 $(call inherit-product, vendor/xiaomi/peridot/peridot-vendor.mk)
-
-# GameBar Performance Overlay
-$(call inherit-product, packages/apps/GameBar/gamebar.mk)
-
-# Vendor MiuiCamera
 $(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
 
+# BestROM: GameBar removed (44 MB system_ext priv-app + init.gamebar.rc + sepolicy).
+
+# BestROM: MIUI Camera (com.android.camera, 178 MB) removed - AOSP Camera2 remains.
+
+# BestROM: bundled utilities
+PRODUCT_PACKAGES += \
+    Freezer

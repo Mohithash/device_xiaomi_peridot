@@ -1,0 +1,1 @@
+allow hal_ext_touch_default vendor_sysfs_touch:file rw_file_perms;
