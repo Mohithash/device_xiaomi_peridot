@@ -313,11 +313,8 @@ on property:vendor.post_boot.parsed=1
     write /dev/cpuset/restricted/cpus 0-3
     write /dev/cpuset/foreground/cpus 0-6
 
-    # IRQ Tuning
-    # IRQ 70: msm_drm0
-    # IRQ 222: kgsl_3d0_irq
-    write /proc/irq/70/smp_affinity_list 2
-    write /proc/irq/222/smp_affinity_list 1
+    # IRQ tuning moved to init.qcom.post_boot.sh: the numbers are assigned in
+    # probe order and are not stable, so they have to be resolved by name.
 
     # Battery Saving Tweak
     write /proc/sys/kernel/perf_cpu_time_max_percent 15
@@ -354,8 +351,9 @@ on property:vendor.post_boot.parsed=1
     write /proc/sys/walt/sched_min_task_util_for_uclamp 0
     write /proc/sys/walt/sched_busy_hyst_ns 10000000
 
-    # Disable multiple kswapd threads
-    write /proc/sys/vm/kswapd_threads 1
+    # Swap readahead off: every swap page comes from zram, where a fault is a
+    # decompression, not a seek, so reading 8 pages to use 1 is pure overhead.
+    write /proc/sys/vm/page-cluster 0
 
 on property:sys.boot_completed=1
     # KGSL

@@ -99,3 +99,23 @@ esac
 misc_link=$(ls -l /dev/block/bootdevice/by-name/misc)
 real_path=${misc_link##*>}
 setprop persist.vendor.mmi.misc_dev_path $real_path
+
+# Pin the display and GPU interrupts off CPU0.
+#
+# This used to live in init.peridot.rc as two hard-coded writes to IRQ 70 and
+# 222, labelled msm_drm0 and kgsl_3d0_irq. Linux hands out IRQ numbers in
+# probe order, so they are not stable: on 6.1.176 IRQ 70 is
+# arm-smmu-context-fault and IRQ 222 is wdog, and both writes landed on those
+# instead, while msm_drm (330) and kgsl_3d0_irq (324) stayed on CPU0 with
+# every other interrupt. Resolve them by name so the fix survives a kernel
+# bump, and skip quietly if the name is absent.
+pin_irq_by_name() {
+    irq=`awk -v n="$1" '$NF == n { sub(":", "", $1); print $1; exit }' /proc/interrupts`
+    if [ -n "$irq" ] && [ -w /proc/irq/$irq/smp_affinity_list ]; then
+        echo "$2" > /proc/irq/$irq/smp_affinity_list
+    fi
+}
+
+# Silver cores are 0-2; leave CPU0 for the general interrupt load.
+pin_irq_by_name msm_drm 2
+pin_irq_by_name kgsl_3d0_irq 1
