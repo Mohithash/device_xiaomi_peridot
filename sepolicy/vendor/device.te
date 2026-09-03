@@ -10,3 +10,7 @@ type vendor_miev_device, dev_type;
 
 # Touch
 type touchfeature_device, dev_type;
+
+# Kernel oops/panic log partition, wrapped as an MTD device by block2mtd so
+# mtdoops can persist last_kmsg across a crash.
+type oops_block_device, dev_type;

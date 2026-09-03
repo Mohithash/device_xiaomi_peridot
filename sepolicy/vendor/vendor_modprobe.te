@@ -1,0 +1,18 @@
+# block2mtd is a module, and the partition it wraps is named on the kernel
+# command line (block2mtd.block2mtd=/dev/block/by-name/oops,2097152, set in
+# the Xiaomi DTB chosen node, not by this device tree). A module parameter is
+# applied during module init, and module init runs in the context of whatever
+# inserted the module -- here /vendor/bin/modprobe, u:r:vendor_modprobe:s0 --
+# so the in-kernel blkdev_get_by_path() walk is checked against that domain,
+# not against kernel:s0.
+#
+# Without these rules the walk is denied at the very first component:
+#   avc: denied { search } for comm="modprobe" name="block" dev="tmpfs"
+#     scontext=u:r:vendor_modprobe:s0 tcontext=u:object_r:block_device:s0
+# and the kernel then prints
+#   block2mtd: error: cannot open device /dev/block/by-name/oops
+# /proc/mtd stays empty, mtdoops never binds a backing device, and kernel
+# panic logs are lost instead of being written to the oops partition.
+allow vendor_modprobe block_device:dir search;
+allow vendor_modprobe block_device:lnk_file read;
+allow vendor_modprobe oops_block_device:blk_file rw_file_perms;
