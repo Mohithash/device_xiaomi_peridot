@@ -140,8 +140,7 @@ BOARD_BOOTCONFIG := \
     androidboot.load_modules_parallel=true \
     androidboot.vendor.qspa=true \
     androidboot.hypervisor.protected_vm.supported=false \
-    androidboot.init_fatal_reboot_target=recovery \
-    androidboot.selinux=permissive
+    androidboot.init_fatal_reboot_target=recovery
 
 # Kernel modules
 first_stage_modules := $(strip $(shell cat $(TARGET_KERNEL_SOURCE)/modules.list.msm.pineapple $(DEVICE_PATH)/modules/modules.list.first_stage))
