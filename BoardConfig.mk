@@ -78,9 +78,10 @@ TARGET_SCREEN_HEIGHT := 2712
 # inert here: vendor/voltage/bootanimation/Android.bp is a prebuilt_media module
 # that picks 1280/1920/2560.zip from soong_config voltage_bootanimation.resolution,
 # which BoardConfigSoong.mk:26 fills from TARGET_BOOT_ANIMATION_RES. That is set to
-# 2560 in bestrom_peridot.mk. The zip BestROM shipped in prebuilt/bootanimation/
-# was itself copied from vendor/voltage/bootanimation/2560.zip, so this is the same
-# animation, sourced natively instead of overridden.
+# 2560 in bestrom_peridot.mk. The zip BestROM used to carry in prebuilt/bootanimation/
+# was itself a copy of vendor/voltage/bootanimation/2560.zip, so it was 2 MB of
+# duplicate that nothing read; it has been removed. A genuine BestROM animation
+# would be generated into vendor/bestrom and selected from there.
 
 # Filesystem
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/configs/config.fs
