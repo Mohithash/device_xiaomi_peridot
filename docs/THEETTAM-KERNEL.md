@@ -201,6 +201,28 @@ Xiaomi asks for state 3 (900 MHz); the kernel stores 2 (950 MHz). The
 emergency states at the top of the range are deliberately left unmapped, so
 genuine critical throttling still works at full strength.
 
+Measured directly, by driving `cooling_device37/cur_state` with the power-HAL
+ceiling already lifted to 1100000000 (device idle at 35 °C, screen on, each
+state read back immediately, `mi_thermald` re-asserting within its 2000 ms
+poll):
+
+        written   stored    max_freq       thermal_pwrlevel
+        0         0         1100000000     0
+        1         1         1000000000     1
+        2         2          950000000     2
+        4         3          900000000     3
+        3         2          950000000     2
+
+Two things this proves. Writing 4 stores 3 and writing 3 stores 2, which is
+`devfreq_cdev_map_state()` doing exactly the arithmetic above — the remap is
+real and active on this device, not merely present in the source. And at
+state 0 the GPU reaches the full 1100 MHz, so the OPP table and the hardware
+support the top level; nothing but the cooling request holds it down.
+
+GPU temperature fell slightly across the run (35.5 -> 34.7 °C), which is the
+expected result: raising a *ceiling* while idle changes nothing, because the
+governor only selects a higher frequency under load.
+
 The state then becomes a `DEV_PM_QOS_MAX_FREQUENCY` request on the kgsl
 devfreq device, and PM QoS aggregates that class as the *minimum* of all
 requests — which is why writing 1100000000 to `max_freq` reads back
