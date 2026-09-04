@@ -77,8 +77,10 @@ on boot
     # Buffers
     write /proc/sys/net/core/rmem_max 16777216
     write /proc/sys/net/core/wmem_max 16777216
-    write /proc/sys/net/ipv4/tcp_rmem 4096 87380 16777216
-    write /proc/sys/net/ipv4/tcp_wmem 4096 65536 16777216
+    # tcp_rmem/tcp_wmem are deliberately not set here: the framework rewrites
+    # both from config_wifi_tcp_buffers in overlay/WifiOverlayPeridot on every
+    # default-network change, so anything written at init is replaced as soon
+    # as a network comes up. That overlay is the one place to change them.
 
     # Keepalive
     write /proc/sys/net/ipv4/tcp_keepalive_time 600
