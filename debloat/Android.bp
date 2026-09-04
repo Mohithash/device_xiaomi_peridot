@@ -1,3 +1,19 @@
+//
+// SPDX-FileCopyrightText: BestROM
+// SPDX-License-Identifier: Apache-2.0
+//
+// A soong module cannot be "un-inherited" from a product, but a module that
+// overrides: it replaces it, and this one installs nothing. So listing a name
+// here removes it from the build. Mechanism proof: Traceur (added by AOSP's
+// handheld_system.mk:74) is listed and is absent from installed-files, while
+// BasicDreams/BookmarkProvider/CaptivePortalLogin from the same makefile are
+// not listed and do ship.
+//
+// Every name here was checked against out/target/product/peridot/all_modules.txt.
+// An entry naming a module that does not exist is a silent no-op, which is how
+// this list previously accumulated 34 dead GApps/carrier entries inherited from
+// somebody else's debloat list.
+
 cc_prebuilt_binary {
     name: "RemovePackagesPeridot",
     srcs: ["RemovePackagesPeridot"],
@@ -6,48 +22,7 @@ cc_prebuilt_binary {
         none: true,
     },
     overrides: [
-        "Camera2",
-        "AmbientSensePrebuilt",
-        "arcore",
-        "Chrome",
-        "Chrome-Stub",
-        "ConnMO",
-        "ConnMetrics",
-        "DCMO",
-        "DMService",
-        "DevicePolicyPrebuilt",
-        "GCS",
-        "GoogleTTS",
-        "MyVerizonServices",
-        "OBDM_Permissions",
-        "OdadPrebuilt",
-        "OemDmTrigger",
-        "OPScreenRecord",
-        "Ornament",
-        "PixelBuds",
-        "PixelLiveWallpaperPrebuilt",
-        "SCONE",
-        "SafetyHubPrebuilt",
-        "ScribePrebuilt",
-        "Showcase",
-        "SoundAmplifierPrebuilt",
-        "SprintDM",
-        "SprintHM",
-        "Traceur",
-        "Tycho",
-        "Updater",
-        "USCCDM",
-        "VZWAPNLib",
-        "Via",
-        "Videos",
-        "VzwOmaTrigger",
-        "obdm_stub",
-
-        // BestROM ultra-minimal. These were listed in the (non-functional)
-        // filter-out in lineage_peridot.mk and are actually removed here.
-        // Mechanism proof: Traceur (handheld_system.mk:74) is in this list and
-        // is absent from installed-files, while BasicDreams/BookmarkProvider/
-        // CaptivePortalLogin from the same makefile are not listed and ship.
+        // --- AOSP handheld_system.mk / telephony extras ---
         "AvatarPicker",
         "BuiltInPrintService",
         "DeviceAsWebcam",
@@ -57,6 +32,35 @@ cc_prebuilt_binary {
         "PrintSpooler",
         "QuickSearchBox",
         "SimAppDialog",
+        "Traceur",
         "WfdService",
+
+        // --- VoltageOS extras (vendor/voltage/config/packages.mk) ---
+        // These ship regardless of common_mobile vs common_full_phone, because
+        // common.mk:267 includes packages.mk unconditionally.
+        "Covers",             // cover-screen UI; peridot is not a foldable
+        "Etar",               // calendar
+        "GameSpace",          // game mode overlay
+        "Gramophone",         // music player
+        "Jellyfish",          // live wallpaper
+        "LMOFreeform",        // freeform windowing
+        "LMOFreeformSidebar",
+        "LogViewer",
+        "OmniJaws",           // weather provider
+        "AppDataBackup",
+        "ExactCalculator",
+
+        // Deliberately NOT removed, though they are Voltage extras:
+        //   Aperture       - the only camera app in the tree
+        //   Glimpse        - the only gallery; Aperture opens it by intent
+        //   Seedvault      - the restore path the setup wizard offers
+        //   ThemePicker    - backs Settings > Wallpaper & style
+        //   ThemesStub
+        //   Datura         - firewall; privacy-relevant, deliberately kept
+        //   VoltageSetupWizard - packages/apps/SetupWizard defines this and
+        //                    there is no other setup wizard in the tree, so
+        //                    removing it means no first-boot flow at all.
+        //                    It is rebranded via overlay instead.
+        //   Updater        - wanted for BestROM OTA; see vendor/bestrom.
     ],
 }

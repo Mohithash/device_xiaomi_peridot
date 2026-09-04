@@ -21,10 +21,12 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
 # Inherit some common VoltageOS stuff.
-# BestROM: ultra-minimal - common_mobile (essentials) + telephony instead of
-# common_full_phone, which also drags in the extra apps and fonts.
-# VoltageOS mirrors the same config split, so this is a 1:1 swap from the
-# previous vendor/lineage/config/{common_mobile,telephony}.mk pair.
+# NOTE: choosing common_mobile over common_full_phone does NOT make the build
+# minimal, contrary to what this comment used to claim. common_mobile.mk:2
+# inherits common.mk, which at :267 includes packages.mk unconditionally and at
+# :253 inherits fonts.mk - so every VoltageOS app and font ships either way.
+# The entire delta is PRODUCT_SIZE, the LatinIME dictionaries overlay and
+# ro.support_one_handed_mode. Actual slimming is done in debloat/Android.bp.
 $(call inherit-product, vendor/voltage/config/common_mobile.mk)
 $(call inherit-product, vendor/voltage/config/telephony.mk)
 
