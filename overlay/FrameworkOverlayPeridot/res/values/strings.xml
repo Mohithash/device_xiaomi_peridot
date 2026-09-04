@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     SPDX-FileCopyrightText: BestROM
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <!-- Shown wherever the platform names itself: Settings > About, the
+         "Android System" attribution on notifications and permission
+         dialogs, and app info pages. AOSP default is "Android System"
+         (frameworks/base/core/res/res/values/strings.xml). -->
+    <string name="android_system_label">BestROM</string>
+</resources>
