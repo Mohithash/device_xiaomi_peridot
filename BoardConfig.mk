@@ -130,7 +130,6 @@ TARGET_KERNEL_CONFIG := \
 
 BOARD_KERNEL_CMDLINE := \
     sysctl.kernel.firmware_config.force_sysfs_fallback=1 \
-    swinfo.fingerprint=peridot:$(LINEAGE_VERSION) \
     mtdoops.fingerprint=peridot:$(LINEAGE_VERSION)
 
 BOARD_BOOTCONFIG := \
