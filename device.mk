@@ -268,15 +268,12 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml \
     frameworks/native/data/etc/android.hardware.keystore.app_attest_key.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.keystore.app_attest_key.xml
 
-# Lineage Health
-PRODUCT_PACKAGES += \
-    vendor.ext.health-service.default
-
-$(call soong_config_set_bool,lineage_health,charging_control_supports_bypass,false)
-$(call soong_config_set,lineage_health,fast_charge_node,/sys/class/qcom-battery/fastcharge_enable)
-$(call soong_config_set,lineage_health,fast_charge_value_none,0)
-$(call soong_config_set,lineage_health,fast_charge_value_fast_charge,1)
-$(call soong_config_set,lineage_health,fast_charge_value_super_fast_charge,2)
+# BestROM: Lineage Health removed. It provided charging control via
+# vendor.ext.health-service.default plus the lineage_health soong namespace,
+# both of which live in hardware/lineage/interfaces. VoltageOS has no
+# equivalent HAL, so the package would not resolve and the soong_config_set
+# calls would target a namespace nothing reads. The fast-charge node is
+# /sys/class/qcom-battery/fastcharge_enable if this is ever ported back.
 
 # BestROM: XiaomiParts (org.lineageos.settings) removed - ultra-minimal build.
 
@@ -351,7 +348,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     CarrierConfigOverlayPeridot \
     FrameworkOverlayPeridot \
-    LineageSettingsOverlayPeridot \
     NfcOverlayPeridot \
     SecureElementOverlayPeridot \
     SettingsOverlayPeridot \
@@ -401,7 +397,7 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/google/pixel \
     hardware/google/pixel/pixelstats \
     hardware/google/pixel/power-libperfmgr \
-    hardware/lineage/interfaces/power-libperfmgr \
+    hardware/voltage/interfaces/power-libperfmgr \
     hardware/qcom-caf/common/libqti-perfd-client \
     hardware/nxp/weaver/generic \
     hardware/nxp/keymint/generic \

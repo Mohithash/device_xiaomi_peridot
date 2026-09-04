@@ -68,17 +68,19 @@ TARGET_NO_BOOTLOADER := true
 # Display
 TARGET_SCREEN_DENSITY := 480
 
-# Bootanimation canvas. The peridot panel is 1220x2712 (see kernel dsi-panel-n16t-*-dsc-vid.dtsi).
-# Without these, vendor/lineage/config/common.mk:137-138 defaults to 1080x1920 and the generated
-# animation comes out 1080x360 instead of 1220x406.
+# Panel geometry. The peridot panel is 1220x2712 (see kernel dsi-panel-n16t-*-dsc-vid.dtsi).
+# These mattered to LineageOS's gen-bootanimation.sh, which sized the generated animation from
+# them; VoltageOS ships fixed prebuilt zips instead, so they no longer drive the boot animation.
 TARGET_SCREEN_WIDTH := 1220
 TARGET_SCREEN_HEIGHT := 2712
 
-# BestROM prebuilt boot animation. Path is relative to the TOP OF THE TREE: the genrule in
-# vendor/lineage/bootanimation/Android.bp does a raw "cp ../../../../../<path>" from its sbox dir
-# (out/soong/.temp/sbox/<hash>). The zip is BestROM's 1440x2560 15fps animation, copied from the A16
-# tree at vendor/voltage/bootanimation/2560.zip. Setting this bypasses gen-bootanimation.sh entirely.
-TARGET_BOOTANIMATION := device/xiaomi/peridot/prebuilt/bootanimation/bootanimation.zip
+# BestROM boot animation. TARGET_BOOTANIMATION was a LineageOS mechanism and is
+# inert here: vendor/voltage/bootanimation/Android.bp is a prebuilt_media module
+# that picks 1280/1920/2560.zip from soong_config voltage_bootanimation.resolution,
+# which BoardConfigSoong.mk:26 fills from TARGET_BOOT_ANIMATION_RES. That is set to
+# 2560 in bestrom_peridot.mk. The zip BestROM shipped in prebuilt/bootanimation/
+# was itself copied from vendor/voltage/bootanimation/2560.zip, so this is the same
+# animation, sourced natively instead of overridden.
 
 # Filesystem
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/configs/config.fs
@@ -130,7 +132,7 @@ TARGET_KERNEL_CONFIG := \
 
 BOARD_KERNEL_CMDLINE := \
     sysctl.kernel.firmware_config.force_sysfs_fallback=1 \
-    mtdoops.fingerprint=peridot:$(LINEAGE_VERSION)
+    mtdoops.fingerprint=peridot:$(VOLTAGEVERSION)-$(VOLTAGE_BUILD_DATE)
 
 BOARD_BOOTCONFIG := \
     androidboot.hardware=qcom \
@@ -194,7 +196,7 @@ TARGET_KERNEL_EXT_MODULES := \
 ifneq ($(WITH_GMS),true)
 BOARD_PRODUCTIMAGE_PARTITION_RESERVED_SIZE := 838860800
 endif
--include vendor/lineage/config/BoardConfigReservedSize.mk
+-include vendor/voltage/config/BoardConfigReservedSize.mk
 
 BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_DTBOIMG_PARTITION_SIZE := 25165824
@@ -248,8 +250,8 @@ TARGET_USERIMAGES_USE_F2FS := true
 ENABLE_VENDOR_RIL_SERVICE := true
 
 # Sepolicy
-include device/lineage/sepolicy/libion/sepolicy.mk
-include device/lineage/sepolicy/libperfmgr/sepolicy.mk
+include device/voltage/sepolicy/libion/sepolicy.mk
+include device/voltage/sepolicy/libperfmgr/sepolicy.mk
 include device/qcom/sepolicy_vndr/SEPolicy.mk
 include device/xiaomi/peridot/sepolicy/SEPolicy-diag.mk
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor
@@ -307,7 +309,7 @@ include vendor/xiaomi/peridot/BoardConfigVendor.mk
 -include device/xiaomi/peridot-miuicamera/BoardConfig.mk
 
 
-# BESTROM_INODE_FIX: LineageOS BoardConfigReservedSize.mk sets *_EXTFS_INODE_COUNT ?= -1
+# BESTROM_INODE_FIX: VoltageOS BoardConfigReservedSize.mk sets *_EXTFS_INODE_COUNT ?= -1
 # ("auto"), but mke2fs 1.47.2 rejects -1 ("too many inodes (18446744073709551615)").
 # Set explicit counts sized to each partition's content (~1 inode per 4KB + headroom).
 BOARD_PRODUCTIMAGE_EXTFS_INODE_COUNT := 16384

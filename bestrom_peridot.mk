@@ -4,19 +4,39 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+# VOLTAGE_BUILD is load-bearing and is NOT just a version string.
+# build/make/core/config.mk:501 wraps the entire VoltageOS board-config chain in
+# "ifneq ($(VOLTAGE_BUILD),)", and that chain is what pulls in
+# BoardConfigKernel.mk (the kernel build), BoardConfigQcom.mk (every
+# hardware/qcom-caf + vendor/qcom soong namespace) and BoardConfigSoong.mk.
+# build/make/envsetup.sh:452 only sets it for products literally named
+# "voltage_*", so a rebranded product silently gets an empty value and loses
+# all three - the failure surfaces far away, as "libwifi_hal_vendor_impl_defaults
+# depends on undefined module libwifi-hal-qcom". Set it here so the product name
+# stays bestrom_peridot.
+VOLTAGE_BUILD := peridot
+
 # Inherit from those products. Most specific first.
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
-# Inherit some common Lineage stuff.
+# Inherit some common VoltageOS stuff.
 # BestROM: ultra-minimal - common_mobile (essentials) + telephony instead of
-# common_full_phone, which also drags in Camelot/Etar/Profiles/Recorder/
-# Seedvault/Twelve/AudioFX/unrar/Google-Sans fonts.
-$(call inherit-product, vendor/lineage/config/common_mobile.mk)
-$(call inherit-product, vendor/lineage/config/telephony.mk)
+# common_full_phone, which also drags in the extra apps and fonts.
+# VoltageOS mirrors the same config split, so this is a 1:1 swap from the
+# previous vendor/lineage/config/{common_mobile,telephony}.mk pair.
+$(call inherit-product, vendor/voltage/config/common_mobile.mk)
+$(call inherit-product, vendor/voltage/config/telephony.mk)
 
 # Inherit from peridot device
 $(call inherit-product, device/xiaomi/peridot/device.mk)
+
+# VoltageOS version.mk downloads the official device list and errors out when
+# VOLTAGE_BUILD_TYPE=OFFICIAL and the device is absent. peridot is not official.
+VOLTAGE_BUILD_TYPE := UNOFFICIAL
+
+# 1440x2560 15fps animation - see the boot animation note in BoardConfig.mk
+TARGET_BOOT_ANIMATION_RES := 2560
 
 PRODUCT_NAME := bestrom_peridot
 PRODUCT_DEVICE := peridot
