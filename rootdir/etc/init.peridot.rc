@@ -345,9 +345,6 @@ on property:vendor.post_boot.parsed=1
     write /dev/cpuctl/rt/cpu.shares 20480
     write /dev/cpuctl/top-app/cpu.shares 20480
 
-    # CPUSets
-    setprop dalvik.vm.dex2oat-cpu-set 0,1,2,3,4,5,6
-    setprop dalvik.vm.dex2oat-threads 6
 
     # Schedutil/WALT tuning
     write /proc/sys/walt/sched_upmigrate "90 100"
