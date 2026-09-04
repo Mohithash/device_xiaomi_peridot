@@ -208,7 +208,7 @@ PRODUCT_PACKAGES += \
 
 # IR
 PRODUCT_PACKAGES += \
-    android.hardware.ir-service.ext
+    android.hardware.ir-service.lineage
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.consumerir.xml:$(TARGET_COPY_OUT_ODM)/etc/permissions/android.hardware.consumerir.xml
@@ -346,6 +346,7 @@ PRODUCT_COPY_FILES += \
 
 # Overlays
 PRODUCT_PACKAGES += \
+    ApertureOverlayPeridot \
     CarrierConfigOverlayPeridot \
     FrameworkOverlayPeridot \
     NfcOverlayPeridot \
@@ -470,7 +471,7 @@ PRODUCT_COPY_FILES += \
 
 # Touchscreen
 PRODUCT_PACKAGES += \
-    vendor.ext.touch-service.xiaomi
+    vendor.lineage.touch-service.xiaomi
 
 $(call soong_config_set, XIAOMI_TOUCH, HIGH_TOUCH_POLLING_PATH, /sys/devices/virtual/touch/touch_dev/bump_sample_rate)
 
@@ -551,6 +552,9 @@ $(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
 
 # BestROM: MIUI Camera (com.android.camera, 178 MB) removed - AOSP Camera2 remains.
 
-# BestROM: bundled utilities
-PRODUCT_PACKAGES += \
-    Freezer
+# BestROM: no bundled utilities. Freezer was listed here but neither the APK
+# nor an android_app_import for it ever existed - prebuilt/Android.bp is a
+# comment. It went unnoticed because vendor/voltage/config/common.mk:155 calls
+# enforce-product-packages-exist-internal, which is not a real function, so
+# PRODUCT_ENFORCE_PACKAGES_EXIST is never set and bad entries are dropped
+# silently. Re-add with a real prebuilt module if the APK is ever vendored.
