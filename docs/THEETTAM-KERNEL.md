@@ -108,10 +108,50 @@ Verified live on the rooted build:
 | DAMON reclaim / LRU sort | both `N` | off, nothing enables them |
 | MTE / KASAN | compiled in, off at boot (`kasan=off`) | Xiaomi DTB cmdline |
 | SELinux | genuinely `Enforcing` | see below |
+| GPU ceiling | 900 MHz of an available 1100 | was this tree's powerhint, see below |
 
 `/proc/config.gz` is present (system_server reads it) and is scrubbed of every
 `CONFIG_KSU*`, `CONFIG_KPM*`, `KernelSU` and `SUSFS` line by the kernel's
 `filechk_ikconfig`, so a root build is not identifiable from it.
+
+## The GPU ceiling, measured
+
+Worth recording because it took a device to see it and the config alone was
+misleading in both directions.
+
+`configs/power/powerhint.json` used to set the `GPUMaxFreq` node to
+`DefaultIndex: 3` (900 MHz) with `ResetOnInit`, and nothing in the file ever
+raised it again — the only action that writes `GPUMaxFreq` at all is
+`DISPLAY_INACTIVE`, lowering it to 255 MHz for screen-off. Measured on the
+device, screen on:
+
+    devfreq/available_frequencies  1100 1000 950 900 835 736 684 633 500 353 255 (MHz)
+    devfreq/max_freq               900000000
+    max_gpuclk                     900000000
+    thermal_pwrlevel               3
+
+The cap is binding, not cosmetic. Forcing the governor's floor to the top OPP
+while it was in place gave:
+
+    min_freq written 1100000000 -> reads 900000000, cur_freq 900000000
+
+i.e. the GPU physically could not leave 900 MHz. Lifting the ceiling the way
+`DefaultIndex: 0` does gave, immediately:
+
+    max_freq written 1100000000 -> reads 950000000, cur_freq 950000000
+
+So removing the cap is worth a real 900 -> 950 MHz right now. It is not worth
+the full 1100: above 950 the limiter is a *second, separate* mechanism — the
+`gpu` thermal cooling device, sitting at `cur_state=2`. That one is not this
+device tree's to set, it comes from the vendor thermal-engine configuration,
+and at the time of measurement the GPU was at 33 °C, so it is a static
+baseline rather than heat-driven throttling. Chasing the last two OPPs means
+looking there, not at powerhint.json.
+
+Both `max_freq` and `min_freq` are ordinary devfreq tunables and revert on
+reboot; screen-off/screen-on cycles rewrite `max_freq` from the HAL
+(255000000 / 900000000), which is a quick way to confirm the HAL, not the
+kernel, owns this node.
 
 ## SELinux
 
