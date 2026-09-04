@@ -33,6 +33,12 @@ $(call inherit-product, vendor/voltage/config/telephony.mk)
 # Inherit from peridot device
 $(call inherit-product, device/xiaomi/peridot/device.mk)
 
+# BestROM product layer. Extends vendor/voltage rather than replacing it:
+# branding properties, the build-time overlays that rebrand the setup wizard and
+# repoint OTA, and the Updater package. BESTROM_DEVICE must be set first.
+BESTROM_DEVICE := peridot
+$(call inherit-product, vendor/bestrom/config/branding.mk)
+
 # VoltageOS version.mk downloads the official device list and errors out when
 # VOLTAGE_BUILD_TYPE=OFFICIAL and the device is absent. peridot is not official.
 VOLTAGE_BUILD_TYPE := UNOFFICIAL
@@ -79,7 +85,8 @@ PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 # RemovePackagesPeridot "overrides:" list in
 # device/xiaomi/peridot/debloat/Android.bp. Add new removals THERE.
 
-# BestROM branding
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.bestrom.version=1.0-a17 \
-    ro.bestrom.device=peridot
+# BestROM branding now lives in vendor/bestrom/config/branding.mk, inherited
+# above. It was two PRODUCT_PRODUCT_PROPERTIES here, which put ro.bestrom.* in
+# /product/etc/build.prop where nothing reads them; they are now
+# PRODUCT_SYSTEM_DEFAULT_PROPERTIES in /system/build.prop alongside the
+# platform properties, and ro.modversion is set for the first time.
