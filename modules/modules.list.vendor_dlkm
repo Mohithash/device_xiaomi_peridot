@@ -49,7 +49,6 @@ smmu_proxy_dlkm.ko
 tz_log_dlkm.ko
 synx-driver.ko
 ipclite.ko
-ipclite_test.ko
 ubwcp.ko
 btpower.ko
 bt_fm_slim.ko
