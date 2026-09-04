@@ -257,6 +257,14 @@ include device/qcom/sepolicy_vndr/SEPolicy.mk
 include device/xiaomi/peridot/sepolicy/SEPolicy-diag.mk
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor
 
+# PrivacyKit-Native. The "privacykit" binder is published by system_server, so
+# its type and service_contexts entry are SYSTEM policy, not vendor - the same
+# lane vendor/../device/voltage/sepolicy/common/sepolicy.mk uses. Upstream
+# BestROM carried these two lines in a fork of device/lineage/sepolicy, which
+# this base does not use; keeping them device-side avoids forking
+# device/voltage/sepolicy for two lines.
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/private
+
 # Vendor security patch
 VENDOR_SECURITY_PATCH := 2026-06-01
 

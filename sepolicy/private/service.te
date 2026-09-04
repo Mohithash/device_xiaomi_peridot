@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: BestROM
+# SPDX-License-Identifier: Apache-2.0
+
+# PrivacyKit-Native: system_server publishes the "privacykit" binder in
+# PrivacyKitService.onStart() (started from SystemServer.java). The framework
+# hooks in app processes call into it, so it needs app_api_service as well as
+# system_api_service - without both, every hook fails open and PrivacyKit is
+# silently inert.
+type privacykit_service, system_api_service, system_server_service, app_api_service, service_manager_type;
