@@ -19,6 +19,13 @@ on early-init
     # set tcp_mtu_probing to 1
     write /proc/sys/net/ipv4/tcp_mtu_probing 1
 
+    # Restrict the kernel ring buffer to CAP_SYSLOG. The kernel keeps
+    # /proc/config.gz scrubbed of the root-engine options, but dmesg itself
+    # still carries the driver's own banners, so leave no unprivileged read
+    # path to them. SELinux already blocks the shell here; this is the DAC
+    # half of the same gate, and it is what upstream Android assumes.
+    write /proc/sys/kernel/dmesg_restrict 1
+
     # DRM
     chown system graphics /sys/class/drm/card0/device/power/control
 
