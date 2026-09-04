@@ -141,12 +141,89 @@ i.e. the GPU physically could not leave 900 MHz. Lifting the ceiling the way
     max_freq written 1100000000 -> reads 950000000, cur_freq 950000000
 
 So removing the cap is worth a real 900 -> 950 MHz right now. It is not worth
-the full 1100: above 950 the limiter is a *second, separate* mechanism — the
-`gpu` thermal cooling device, sitting at `cur_state=2`. That one is not this
-device tree's to set, it comes from the vendor thermal-engine configuration,
-and at the time of measurement the GPU was at 33 °C, so it is a static
-baseline rather than heat-driven throttling. Chasing the last two OPPs means
-looking there, not at powerhint.json.
+the full 1100, and the reason is worth spelling out, because it is not what
+it looks like.
+
+### The second limiter is mi_thermald, and it is not temperature-driven
+
+Above 950 MHz the ceiling comes from `cooling_device37`, whose type string is
+`gpu`. Three things about it:
+
+1. **No thermal zone binds it.** Walking every
+   `/sys/class/thermal/thermal_zone*/cdev*` link, all eleven GPU bindings
+   resolve to `cooling_device36` (`devfreq-3d00000.qcom,kgsl-3d0`) — the
+   kernel's own devfreq cooling device, bound to the `gpuss-0..3` zones with
+   real trip points. That one reads `cur_state=0`: the actual
+   temperature-driven protection is not throttling at all.
+2. **`cooling_device37` is driven from userspace by `mi_thermald`**, via
+   `/vendor/etc/thermald-devices.conf` (`name:gpu`, `cooling_name:gpu`).
+3. **Its policy is a permanently-tripped trip point.** The decrypted Xiaomi
+   map for this region (`ro.boot.hwc=IN`) at `/data/vendor/thermal/decrypt.txt`:
+
+        [INDIA-MONITOR-GPU]
+        algo_type  monitor
+        sensor     VIRTUAL-SENSOR0
+        device     gpu
+        polling    2000
+        trig       15000
+        clr        13000
+        target     3
+
+   `trig 15000` is 15 °C, and `VIRTUAL-SENSOR0` is a weighted composite of
+   cpu/battery/charger/wifi/pa/quiet sensors that reads ~35–36 °C in ordinary
+   use. The trip is therefore *always* tripped, at any temperature the phone
+   will ever see, and `mi_thermald` requests GPU cooling state 3 forever.
+   `/data/vendor/thermal/thermal.dump` shows it doing exactly that:
+   `[INDIA-MONITOR-GPU][VIRTUAL-SENSOR0 36196] {[gpu 3]...}`.
+
+So the 950 MHz ceiling is a permanent policy cap wearing thermal clothing,
+not heat management.
+
+### Why it lands on 950 and not 900
+
+Because this kernel already softens it. `drivers/thermal/qcom/qti_devfreq_cdev.c`
+carries commit 80accb269363, "thermal: cpu_cooling, gpu_cooling: tune cdev
+limits to prevent thermal throttling under sustained load", which remaps
+mid-range cooling states while leaving the bottom and the critical tail
+alone (`DEVFREQ_SOFT_THROTTLE_START_STATE 1`, `_DIVIDER 2`,
+`_CRITICAL_TAIL_STATES 2`):
+
+        mi_thermald asks  0 -> stored  0 -> 1100 MHz
+        mi_thermald asks  1 -> stored  1 -> 1000 MHz
+        mi_thermald asks  2 -> stored  2 ->  950 MHz
+        mi_thermald asks  3 -> stored  2 ->  950 MHz   <-- this device, always
+        mi_thermald asks  4 -> stored  3 ->  900 MHz
+        ...
+        mi_thermald asks  9 -> stored  9 ->  353 MHz   <-- tail untouched
+        mi_thermald asks 10 -> stored 10 ->  255 MHz
+
+Xiaomi asks for state 3 (900 MHz); the kernel stores 2 (950 MHz). The
+emergency states at the top of the range are deliberately left unmapped, so
+genuine critical throttling still works at full strength.
+
+The state then becomes a `DEV_PM_QOS_MAX_FREQUENCY` request on the kgsl
+devfreq device, and PM QoS aggregates that class as the *minimum* of all
+requests — which is why writing 1100000000 to `max_freq` reads back
+950000000 while this request stands, and why the screen-off
+`DISPLAY_INACTIVE` value of 255 MHz wins over both.
+
+### What this tree can and cannot do about it
+
+`mi_thermald`, `thermald-devices.conf`, `thermal-map.conf` and
+`thermal-map-india.conf` are all extracted vendor blobs (`proprietary-files.txt`),
+not files this tree authors, and the map is encrypted. So there is no clean
+device-tree edit here. The levers, in increasing order of nerve:
+
+- leave it (the kernel remap already recovered one OPP);
+- ship an edited `thermald-devices.conf` that does not map the `gpu` device,
+  so `mi_thermald` cannot drive the cdev at all — the kernel `gpuss` zones
+  keep protecting the GPU;
+- retune the remap constants in `qti_devfreq_cdev.c`.
+
+Anything beyond the first is a real thermal decision and wants sustained-load
+measurement, not reasoning. Note also that Xiaomi's own userspace has never
+used the top two OPPs on this device, which is a reason for caution rather
+than evidence of a problem.
 
 Both `max_freq` and `min_freq` are ordinary devfreq tunables and revert on
 reboot; screen-off/screen-on cycles rewrite `max_freq` from the HAL
