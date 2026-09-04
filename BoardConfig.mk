@@ -191,7 +191,14 @@ TARGET_KERNEL_EXT_MODULES := \
     qcom/opensource/spu-kernel \
     qcom/opensource/mm-sys-kernel/ubwcp \
     qcom/opensource/touch-drivers \
-    nxp/opensource/driver
+    nxp/opensource/driver \
+    qcom/opensource/fingerprint \
+    xiaomi/drivers/char \
+    xiaomi/drivers/input/misc/aw86927_haptic \
+    xiaomi/drivers/input/misc/si_haptic \
+    xiaomi/drivers/regulator \
+    xiaomi/drivers/thermal/xiaomi \
+    xiaomi/drivers/xiaomi/dump_display
 
 # Partitions
 ifneq ($(WITH_GMS),true)
