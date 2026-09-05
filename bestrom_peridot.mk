@@ -64,21 +64,17 @@ PRODUCT_MODEL := 24069PC21G
 PRODUCT_SYSTEM_NAME := peridot_global
 PRODUCT_SYSTEM_DEVICE := peridot
 
-# BestROM: this block is currently DEAD CODE. PRODUCT_BUILD_PROP_OVERRIDES is
-# not registered in build/make/core/product.mk and is never exported into any
-# soong json by build/make/core/soong_config.mk or soong_extra_config.mk, so
-# override_config() in build/soong/scripts/gen_build_prop.py:50-64 never sees
-# it. Verified in the built ROM: out/target/product/peridot/system/build.prop:29
-# still reads
-# ro.build.fingerprint=POCO/lineage_peridot/peridot:17/CP2A.260605.016/eng.sal:userdebug/test-keys.
-# Gate it to user builds so that if the plumbing is ever restored it cannot
-# stamp a "user/release-keys" fingerprint (and an Android-16 BuildDesc) onto an
-# Android-17 userdebug/test-keys ROM. ro.build.type/ro.build.tags contradicting
-# ro.build.fingerprint is a stronger tell than an honest userdebug fingerprint.
+# BestROM: stock-POCO fingerprint spoof for user builds. PRODUCT_BUILD_PROP_OVERRIDES
+# reaches build/soong/scripts/gen_build_prop.py's override_config(), which only
+# replaces the config keys named here; ro.system.build.fingerprint is generated
+# from a separate BuildSystemFingerprint key, so it must be overridden too or it
+# leaks the real android-17 id (and the eng.<user> build-number fallback).
+# Gated to user builds so a userdebug/test-keys ROM never claims release-keys.
 ifeq ($(TARGET_BUILD_VARIANT),user)
 PRODUCT_BUILD_PROP_OVERRIDES += \
     BuildDesc="peridot_global-user 16 BP2A.250605.031.A3 OS3.0.302.0.WNPMIXM release-keys" \
     BuildFingerprint=POCO/peridot_global/peridot:16/BP2A.250605.031.A3/OS3.0.302.0.WNPMIXM:user/release-keys \
+    BuildSystemFingerprint=POCO/peridot_global/peridot:16/BP2A.250605.031.A3/OS3.0.302.0.WNPMIXM:user/release-keys \
     DeviceName=$(PRODUCT_SYSTEM_DEVICE) \
     DeviceProduct=$(PRODUCT_SYSTEM_NAME)
 endif

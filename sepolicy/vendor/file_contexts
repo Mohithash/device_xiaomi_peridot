@@ -98,3 +98,4 @@
 /sys/devices/virtual/touch/touch_dev/ear_sensor u:object_r:sysfs_tp_virtual_prox:s0
 /sys/devices/virtual/touch/touch_dev/palm_sensor u:object_r:sysfs_tp_virtual_prox:s0
 /vendor/bin/hw/vendor\.bestrom\.touch-service\.xiaomi u:object_r:hal_bestrom_touch_default_exec:s0
+/(vendor|odm)/lib(64)?/vendor\.qti\.qspmhal@1\.0\.so    u:object_r:same_process_hal_file:s0
