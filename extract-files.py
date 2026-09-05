@@ -349,6 +349,14 @@ blob_fixups: blob_fixups_user_type = {
     ),
     'vendor/etc/seccomp_policy/c2audio.vendor.ext-arm64.policy': blob_fixup()
         .add_line_if_missing('setsockopt: 1'),
+    # ATFWD-daemon and qesdk-secmanager are SIGKILLed by minijail on lseek every 5s
+    # forever (AOSP 17 vendor libc paths issue lseek where the A14 vendor libs did not);
+    # sibling qesdk.policy already allows it.
+    (
+        'vendor/etc/seccomp_policy/atfwd@2.0.policy',
+        'vendor/etc/seccomp_policy/qesdksec.policy',
+    ): blob_fixup()
+        .add_line_if_missing('lseek: 1'),
     (
         'vendor/bin/qcc-vendor',
         'vendor/bin/qms',

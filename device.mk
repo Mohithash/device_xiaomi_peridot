@@ -372,9 +372,19 @@ PRODUCT_PACKAGES += \
     vendor_modem_firmware_mountpoint
 
 # Power
+# The module is lineage-libperfmgr; plain libperfmgr does not exist in this tree and
+# VoltageOS does not enforce PRODUCT_PACKAGES, so the HAL silently never shipped
+# (surfaceflinger: "Could not find android.hardware.power.IPower/default").
 PRODUCT_PACKAGES += \
-    android.hardware.power-service.libperfmgr \
+    android.hardware.power-service.lineage-libperfmgr \
     libqti-perfd-client
+
+# Thermal
+# hardware/qcom-caf/thermal; ships its own .rc and VINTF fragment. Without it the
+# framework thermal status is permanently NONE (ThermalManagerService: "No Thermal
+# HAL service on this device") and displayconfig thermalStatusLimit is inert.
+PRODUCT_PACKAGES += \
+    android.hardware.thermal-service.qti
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
