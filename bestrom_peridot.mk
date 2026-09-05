@@ -17,6 +17,10 @@
 VOLTAGE_BUILD := peridot
 
 # Inherit from those products. Most specific first.
+# BestROM flat UI: no window/shade blur (vendor/voltage common.mk else-branch:
+# ro.custom.blur.enable=false, persist.sysui.disableBlur=true, supports_background_blur=0).
+TARGET_ENABLE_BLUR := false
+
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
