@@ -353,6 +353,14 @@ blob_fixups: blob_fixups_user_type = {
         # policy, and getdents64 is already granted by the base policy.
         .regex_replace(r'^_llseek: 1\n', '')
         .regex_replace(r'^getdents64: 1\n', ''),
+    # Services whose scripts never shipped (MIUI-only helpers); init logs a
+    # 'cannot find' for each at every boot. The media variant is static in
+    # props/vendor.prop and the modem stack is unaffected.
+    'vendor/etc/init/init.qti.media.rc': blob_fixup()
+        .regex_replace(r'service qti-media /vendor/bin/init\.qti\.media\.sh\n(?:[ \t]+\S.*\n)+', '')
+        .regex_replace(r'\non late-fs\n[ \t]+start qti-media\n', '\n'),
+    'vendor/etc/init/libxiaomi_qcril.rc': blob_fixup()
+        .regex_replace(r'service xiaomi_modem(?:_cust)?_sh /vendor/bin/init\.xiaomi\.modem(?:\.cust)?\.sh\n(?:[ \t]+\S.*\n)+', ''),
     'vendor/etc/seccomp_policy/codec2.vendor.ext-arm64.policy': blob_fixup()
         .regex_replace(r'^_llseek: 1\n', '')
         .regex_replace(r'^getdents64: 1\n', ''),
