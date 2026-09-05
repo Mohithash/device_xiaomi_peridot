@@ -22,6 +22,8 @@ cc_prebuilt_binary {
         none: true,
     },
     overrides: [
+        // --- VoltageOS easter egg: compiled APK with "VoltageOS" strings, cannot be rebranded ---
+        "VoltageJump",
         // --- AOSP handheld_system.mk / telephony extras ---
         "AvatarPicker",
         "BuiltInPrintService",
