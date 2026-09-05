@@ -348,7 +348,14 @@ blob_fixups: blob_fixups_user_type = {
             r'\1    user root\n'
     ),
     'vendor/etc/seccomp_policy/c2audio.vendor.ext-arm64.policy': blob_fixup()
-        .add_line_if_missing('setsockopt: 1'),
+        .add_line_if_missing('setsockopt: 1')
+        # _llseek is a 32-bit-only syscall name; minijail on arm64 rejects the whole
+        # policy, and getdents64 is already granted by the base policy.
+        .regex_replace(r'^_llseek: 1\n', '')
+        .regex_replace(r'^getdents64: 1\n', ''),
+    'vendor/etc/seccomp_policy/codec2.vendor.ext-arm64.policy': blob_fixup()
+        .regex_replace(r'^_llseek: 1\n', '')
+        .regex_replace(r'^getdents64: 1\n', ''),
     # ATFWD-daemon and qesdk-secmanager are SIGKILLed by minijail on lseek every 5s
     # forever (AOSP 17 vendor libc paths issue lseek where the A14 vendor libs did not);
     # sibling qesdk.policy already allows it.
