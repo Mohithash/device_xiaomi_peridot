@@ -98,4 +98,4 @@ PRODUCT_GMS_CLIENTID_BASE := android-xiaomi
 # above. It was two PRODUCT_PRODUCT_PROPERTIES here, which put ro.bestrom.* in
 # /product/etc/build.prop where nothing reads them; they are now
 # PRODUCT_SYSTEM_DEFAULT_PROPERTIES in /system/build.prop alongside the
-# platform properties, and ro.modversion is set for the first time.
+# platform properties.
