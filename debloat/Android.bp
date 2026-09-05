@@ -59,7 +59,7 @@ cc_prebuilt_binary {
         //   ThemePicker    - backs Settings > Wallpaper & style
         //   ThemesStub
         //   Datura         - firewall; privacy-relevant, deliberately kept
-        //   VoltageSetupWizard - packages/apps/SetupWizard defines this and
+        //   BestromSetupWizard - packages/apps/SetupWizard defines this and
         //                    there is no other setup wizard in the tree, so
         //                    removing it means no first-boot flow at all.
         //                    It is rebranded via overlay instead.
