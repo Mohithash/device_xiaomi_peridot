@@ -571,3 +571,11 @@ $(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
 # enforce-product-packages-exist-internal, which is not a real function, so
 # PRODUCT_ENFORCE_PACKAGES_EXIST is never set and bad entries are dropped
 # silently. Re-add with a real prebuilt module if the APK is ever vendored.
+
+# BestROM boot animation. The canonical animation lives in this tree
+# (prebuilt/bootanimation/bootanimation.zip: 1440x2560 @ 15 fps, part0 intro,
+# part1 loop, the dotted-B mark). vendor/bestrom/build/tasks/bootanimation.mk
+# copies it over VoltageOS's product/media/bootanimation.zip once the product
+# image is assembled - a Soong prebuilt at the same path loses the install
+# collision.
+BESTROM_BOOTANIMATION := device/xiaomi/peridot/prebuilt/bootanimation/bootanimation.zip
