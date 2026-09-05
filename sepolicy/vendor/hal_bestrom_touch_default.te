@@ -1,5 +1,5 @@
 # vendor_sysfs_touch is labelled by this device's genfs_contexts (the
 # bump_sample_rate / game_mode / touch_filters nodes). VoltageOS's
-# device/voltage/sepolicy/common/vendor/hal_lineage_touch_default.te declares
+# device/voltage/sepolicy/common/vendor/hal_bestrom_touch_default.te declares
 # the domain but grants no access to it, so this rule stays device-side.
-allow hal_lineage_touch_default vendor_sysfs_touch:file rw_file_perms;
+allow hal_bestrom_touch_default vendor_sysfs_touch:file rw_file_perms;

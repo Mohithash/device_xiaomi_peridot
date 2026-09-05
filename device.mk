@@ -208,7 +208,7 @@ PRODUCT_PACKAGES += \
 
 # IR
 PRODUCT_PACKAGES += \
-    android.hardware.ir-service.lineage
+    android.hardware.ir-service.xiaomi
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.consumerir.xml:$(TARGET_COPY_OUT_ODM)/etc/permissions/android.hardware.consumerir.xml
@@ -376,7 +376,7 @@ PRODUCT_PACKAGES += \
 # VoltageOS does not enforce PRODUCT_PACKAGES, so the HAL silently never shipped
 # (surfaceflinger: "Could not find android.hardware.power.IPower/default").
 PRODUCT_PACKAGES += \
-    android.hardware.power-service.lineage-libperfmgr \
+    android.hardware.power-service.xiaomi-libperfmgr \
     libqti-perfd-client
 
 # Thermal
@@ -480,7 +480,7 @@ PRODUCT_COPY_FILES += \
 
 # Touchscreen
 PRODUCT_PACKAGES += \
-    vendor.lineage.touch-service.xiaomi
+    vendor.bestrom.touch-service.xiaomi
 
 $(call soong_config_set, XIAOMI_TOUCH, HIGH_TOUCH_POLLING_PATH, /sys/devices/virtual/touch/touch_dev/bump_sample_rate)
 
