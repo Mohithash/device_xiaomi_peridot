@@ -555,15 +555,18 @@ PRODUCT_COPY_FILES += \
 
 # Vendor
 $(call inherit-product, vendor/xiaomi/peridot/peridot-vendor.mk)
-$(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
 
 # BestROM: GameBar removed (44 MB system_ext priv-app + init.gamebar.rc + sepolicy).
 
-# BestROM: MiuiCamera IS the camera. It ships from the inherit above (186 MB at
-# /system/priv-app/MiuiCamera) and Aperture is dropped via PRODUCT_NO_CAMERA in
-# bestrom_peridot.mk. This comment previously claimed MIUI Camera was removed and
-# AOSP Camera2 remained; that was true only while the peridot-miuicamera repos were
-# unsynced, and stopped being true when they were added to the local manifest.
+# BestROM: Aperture (org.lineageos.aperture, packages/apps/Aperture) IS the camera.
+# It comes from vendor/voltage/config/packages.mk:27-30, which adds it unless
+# PRODUCT_NO_CAMERA is set - and nothing sets that flag any more.
+# MiuiCamera was removed entirely: the 187 MB /system/priv-app APK was the single
+# largest item in the ROM, and its post-capture MIVI processing gets killed, so
+# photos stayed hidden in MediaStore until the next camera launch. The
+# inherit-product-if-exists of device/xiaomi/peridot-miuicamera/device.mk used to
+# sit here; both peridot-miuicamera projects are gone from the local manifest and
+# both worktrees are deleted. Do NOT re-add the inherit without re-adding them.
 
 # BestROM: no bundled utilities. Freezer was listed here but neither the APK
 # nor an android_app_import for it ever existed - prebuilt/Android.bp is a
