@@ -4,4 +4,6 @@
     <integer name="config_defaultNightMode">2</integer>
     <!-- BestROM: show the battery percentage in the status bar by default. -->
     <bool name="config_defaultBatteryPercentageSetting">true</bool>
+    <!-- BestROM: keep far more call history per SIM than the 500-entry default. -->
+    <integer name="config_maximumCallLogEntriesPerSim">10000</integer>
 </resources>
