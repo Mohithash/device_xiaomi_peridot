@@ -3,8 +3,5 @@
      SPDX-FileCopyrightText: BestROM
      SPDX-License-Identifier: Apache-2.0
 -->
-<!-- BestROM monochrome: black and greys only. -->
 <resources>
-    <color name="background_device_default_dark">#FF000000</color>
-    <color name="config_defaultNotificationColor">#FF9CA3AF</color>
 </resources>
