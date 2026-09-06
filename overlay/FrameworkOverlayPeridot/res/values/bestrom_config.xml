@@ -2,9 +2,6 @@
 <resources>
     <!-- BestROM: dark theme out of the box. 2 = UiModeManager.MODE_NIGHT_YES -->
     <integer name="config_defaultNightMode">2</integer>
-    <!-- BestROM flat UI: no blur on app launch or shade expansion. -->
-    <bool name="config_enableAppLaunchBlur">false</bool>
-    <bool name="config_enableBlurExpansion">false</bool>
     <!-- BestROM: show the battery percentage in the status bar by default. -->
     <bool name="config_defaultBatteryPercentageSetting">true</bool>
 </resources>

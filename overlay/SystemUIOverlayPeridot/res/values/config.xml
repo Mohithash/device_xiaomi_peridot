@@ -16,22 +16,9 @@
 
     <!-- Should we vibrate on an icon animation of the shelf. This should only be active if the
      vibrator is capable of subtle vibrations -->
-    <bool name="config_vibrateOnIconAnimation">false</bool>
+    <bool name="config_vibrateOnIconAnimation">true</bool>
 
     <!-- Preferred refresh rate at keyguard, if supported by the display. Overrides
          keyguardMaxRefreshRate. -->
     <integer name="config_keyguardRefreshRate">120</integer>
-    <!-- BestROM: a leaner default Quick Settings set. Everything else stays available in the tile editor. -->
-    <string name="quick_settings_tiles_default" translatable="false">
-        internet,bt,flashlight,dnd,rotation,battery,screenrecord,airplane
-    </string>
-
-    <!-- BestROM: keep the status bar quiet by default. -->
-    <string-array name="config_statusBarIconsToExclude" translatable="false">
-        <item>@*android:string/status_bar_rotate</item>
-        <item>@*android:string/status_bar_headset</item>
-        <item>@*android:string/status_bar_alarm_clock</item>
-        <item>@*android:string/status_bar_bluetooth</item>
-        <item>@*android:string/status_bar_vpn</item>
-    </string-array>
 </resources>
