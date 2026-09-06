@@ -568,6 +568,37 @@ $(call inherit-product, vendor/xiaomi/peridot/peridot-vendor.mk)
 # inherit-product-if-exists of device/xiaomi/peridot-miuicamera/device.mk used to
 # sit here; both peridot-miuicamera projects are gone from the local manifest and
 # both worktrees are deleted. Do NOT re-add the inherit without re-adding them.
+#
+# Lens exposure and extensions were audited after the switch and needed no
+# device change: this tree's camera config is byte-identical to LineageOS
+# 23.2's peridot tree, which also ships Aperture (props/odm.prop camera block,
+# props/vendor.prop camera block and overlay/ApertureOverlayPeridot all diff
+# clean against it).
+#   - All three lenses come from ApertureOverlayPeridot alone. Aperture keeps
+#     camera IDs "0" and "1" unconditionally and admits any other ID only when
+#     config_enableAuxCameras is true (packages/apps/Aperture/app/src/main/java/
+#     org/lineageos/aperture/repositories/CameraRepository.kt), which that RRO
+#     sets. peridot has exactly three sensors - IMX882 wide, IMX355 ultra,
+#     OV20B40 front - per vendor/xiaomi/peridot/proprietary/odm/lib64/camera/
+#     com.qti.sensormodule.peridot_* and sensorModuleNumber=3 in
+#     odm/etc/camera/camxoverridesettings.txt.
+#   - No camera allowlist prop is needed. vendor.camera.aux.packagelist
+#     (frameworks/base core/java/android/hardware/Camera.java:301) defaults to
+#     the caller's own package when unset, so aux IDs are already exposed, and
+#     persist.vendor.camera.privapp.list (CameraDeviceImpl.java:2077,
+#     SurfaceUtils.java:347, CameraDeviceClient.cpp:113, CameraService.cpp:2000)
+#     only relaxes reprocess/stream-size validation and client eviction for
+#     privileged apps - a CameraX app needs none of that. The one tree that set
+#     it was device/xiaomi/peridot-miuicamera/system.prop, which is gone, along
+#     with that tree's soong_config_set camera/override_format_from_reserved
+#     (consumed only by the HIDL camera.device@3.2/3.3 default impl, which this
+#     device does not use - it runs vendor.qti.camera.provider-service_64).
+#   - ro.camerax.extensions.enabled=false (props/odm.prop:30) is upstream
+#     (blame 9721530a, 2024-06-12), not a MiuiCamera addition, and stays false:
+#     nothing declares the vendor androidx.camera.extensions.impl shared library
+#     that proprietary-files.txt:997 puts in /vendor/framework, so the extension
+#     path has no implementation behind it. Aperture's <uses-library> for it is
+#     required="false", so extension modes simply do not appear.
 
 # BestROM: no bundled utilities. Freezer was listed here but neither the APK
 # nor an android_app_import for it ever existed - prebuilt/Android.bp is a
