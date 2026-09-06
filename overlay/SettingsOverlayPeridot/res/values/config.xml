@@ -26,4 +26,8 @@ u         scaling vibrations. The medium intensity will be skipped.
     <!-- Enable Refresh Rate Switch -->
     <bool name="config_show_peak_refresh_rate_switch">true</bool>
     <bool name="config_show_min_refresh_rate_switch">true</bool>
+    <!-- The radius of the enrollment progress bar, in dp. Settings positions the
+         UDFPS enrol ring and icon with it; peridot's sensor needs 90 (same value
+         as the LineageOS, PixelOS and GuidixX peridot trees). -->
+    <integer name="config_udfpsEnrollProgressBar">90</integer>
 </resources>
