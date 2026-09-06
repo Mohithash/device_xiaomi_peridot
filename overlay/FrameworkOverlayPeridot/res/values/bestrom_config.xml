@@ -6,4 +6,18 @@
     <bool name="config_defaultBatteryPercentageSetting">true</bool>
     <!-- BestROM: keep far more call history per SIM than the 500-entry default. -->
     <integer name="config_maximumCallLogEntriesPerSim">10000</integer>
+
+    <!-- BestROM: vibration off out of the box. 0 = Vibrator.VIBRATION_INTENSITY_OFF.
+         Runtime fallbacks: VibrationSettings.updateSettings loads each
+         Settings.System.*_VIBRATION_INTENSITY with -1 and falls back here, so they
+         also apply on a dirty flash while the user has not touched the slider.
+         Sliders stay available (SettingsOverlayPeridot keeps
+         config_vibration_supported_intensity_levels = 3).
+         config_defaultHapticFeedbackIntensity is deliberately NOT set to 0: that
+         would also silence accessibility and power-button/fingerprint haptics;
+         touch feedback is off via def_haptic_feedback in the SettingsProvider RRO. -->
+    <integer name="config_defaultRingVibrationIntensity">0</integer>
+    <integer name="config_defaultNotificationVibrationIntensity">0</integer>
+    <integer name="config_defaultAlarmVibrationIntensity">0</integer>
+    <integer name="config_defaultMediaVibrationIntensity">0</integer>
 </resources>

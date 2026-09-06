@@ -6,4 +6,20 @@
 <resources>
     <!-- Default for Settings.Global.DEVICE_NAME $1=MODEL-->
     <string name="def_device_name_simple">Redmi Turbo 3</string>
+
+    <!-- BestROM: Sound & vibration ships silent. First-boot seeds only;
+         an existing install keeps whatever the user already had. -->
+    <!-- Dial pad tones -> Settings.System.DTMF_TONE_WHEN_DIALING -->
+    <bool name="def_dtmf_tones_enabled">false</bool>
+    <!-- Touch sounds -> Settings.System.SOUND_EFFECTS_ENABLED -->
+    <bool name="def_sound_effects_enabled">false</bool>
+    <!-- Touch feedback -> Settings.System.HAPTIC_FEEDBACK_ENABLED
+         (gates USAGE_TOUCH only; accessibility + hardware haptics stay alive) -->
+    <bool name="def_haptic_feedback">false</bool>
+    <!-- Screen locking sound -> Settings.System.LOCKSCREEN_SOUNDS_ENABLED (integer!) -->
+    <integer name="def_lockscreen_sounds_enabled">0</integer>
+    <!-- Charging sounds -> Settings.Secure.CHARGING_SOUNDS_ENABLED -->
+    <bool name="def_charging_sounds_enabled">false</bool>
+    <!-- Charging vibration -> Settings.Secure.CHARGING_VIBRATION_ENABLED -->
+    <bool name="def_charging_vibration_enabled">false</bool>
 </resources>
