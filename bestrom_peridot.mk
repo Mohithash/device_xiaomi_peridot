@@ -46,6 +46,15 @@ VOLTAGE_BUILD_TYPE := UNOFFICIAL
 # 1440x2560 15fps animation - see the boot animation note in BoardConfig.mk
 TARGET_BOOT_ANIMATION_RES := 2560
 
+# Camera: MiuiCamera, not Aperture.
+# vendor/voltage/config/packages.mk:28-31 adds Aperture unless this is set, and that
+# is the flag's ONLY use in the tree, so it drops Aperture and nothing else.
+# MiuiCamera is not affected - it comes from device/xiaomi/peridot-miuicamera/device.mk
+# (inherited at device.mk:549), which is why it was already shipping.
+# Aperture is org.lineageos.aperture, so this also removes the last user-facing
+# LineageOS application and its two /product/etc/sysconfig entries.
+PRODUCT_NO_CAMERA := true
+
 PRODUCT_NAME := bestrom_peridot
 PRODUCT_DEVICE := peridot
 PRODUCT_MANUFACTURER := Xiaomi

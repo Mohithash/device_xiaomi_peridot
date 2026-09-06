@@ -11,3 +11,7 @@ allow hal_aidlbgservice system_server:binder transfer;
 allow hal_aidlbgservice system_server:binder { call transfer };
 allow hal_aidlbgservice system_server:fd *;
 add_service(hal_aidlbgservice_server, hal_aidlbgservice_service)
+
+# MiuiCamera (platform_app) looks up IBGService directly (sweep-2200 #6)
+allow { platform_app platform_app_36 } hal_aidlbgservice_service:service_manager find;
+allow { platform_app platform_app_36 } hal_aidlbgservice_server:binder call;

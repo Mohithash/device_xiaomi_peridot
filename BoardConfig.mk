@@ -321,6 +321,9 @@ WPA_SUPPLICANT_VERSION := VER_0_8_X
 # Vendor
 include vendor/xiaomi/peridot/BoardConfigVendor.mk
 
+# Vendor MiuiCamera
+-include device/xiaomi/peridot-miuicamera/BoardConfig.mk
+
 
 # BESTROM_INODE_FIX: VoltageOS BoardConfigReservedSize.mk sets *_EXTFS_INODE_COUNT ?= -1
 # ("auto"), but mke2fs 1.47.2 rejects -1 ("too many inodes (18446744073709551615)").
