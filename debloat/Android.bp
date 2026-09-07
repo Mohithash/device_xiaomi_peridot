@@ -9,10 +9,57 @@
 // BasicDreams/BookmarkProvider/CaptivePortalLogin from the same makefile are
 // not listed and do ship.
 //
-// Every name here was checked against out/target/product/peridot/all_modules.txt.
-// An entry naming a module that does not exist is a silent no-op, which is how
-// this list previously accumulated 34 dead GApps/carrier entries inherited from
-// somebody else's debloat list.
+// Two checks are required before adding a name here.
+//
+//  1. OUTBOUND: the module exists in
+//     out/target/product/peridot/all_modules.txt. An entry naming a module
+//     that does not exist is a silent no-op, which is how this list
+//     previously accumulated 34 dead GApps/carrier entries inherited from
+//     somebody else's debloat list.
+//
+//  2. INBOUND: every surviving caller of the package must either resolve it
+//     before offering the entry point, or tolerate its absence. The test is
+//     NOT "does anything reference the package" -- plenty of guarded
+//     references are harmless. The test is whether an UNGUARDED reference
+//     survives. Grep the ApplicationId (not the Soong module name) across
+//     packages/apps/Settings/src AND res/xml, packages/apps/Powerhub,
+//     frameworks/base/services, frameworks/base/core, and config_*/default-app
+//     resources, then read each hit: a PreferenceController whose
+//     getAvailabilityStatus() calls resolveActivity/queryIntentActivities is
+//     safe; one that returns AVAILABLE unconditionally and then
+//     startActivity()s is a crash. A bare <intent> inside a res/xml
+//     <Preference> is a crash too - the click is consumed before it reaches
+//     DashboardFragment's catalyst intent guard.
+//
+//     LogViewer (app.grapheneos.logviewer) passed check 1 and failed check 2:
+//     LogcatLinkPrefController.getAvailabilityStatus() returned
+//     ExtSettingControllerHelper.getGlobalSettingAvailability(), which only
+//     asks whether this is the system user, and then
+//     handlePreferenceTreeClick() startActivity()d LogViewerApp
+//     .getLogcatIntent(). Settings died with ActivityNotFoundException on
+//     every tap of System > View logs. It is no longer removed; see below.
+//     OmniJaws (org.omnirom.omnijaws) failed check 2 the same way, via a bare
+//     <intent> in packages/apps/Powerhub/res/xml/powerhub_lockscreen_weather
+//     .xml; that one is now guarded in LockScreenWeatherSettings.java.
+//
+//     Inbound audit of the remaining entries (done, do not repeat):
+//       DeviceDiagnostics - GUARDED. DeviceDiagnosticsPreferenceController.kt
+//                           getIntent() resolveActivity()s and
+//                           getAvailabilityStatus() returns
+//                           UNSUPPORTED_ON_DEVICE. Row disappears.
+//       EmergencyInfo     - GUARDED. EmergencyInfoPreferenceController.java
+//                           queryIntentActivities, returns
+//                           UNSUPPORTED_ON_DEVICE.
+//       PrintSpooler / BuiltInPrintService / PrintRecommendationService
+//                         - SAFE. PrintSettingPreferenceController.java gates
+//                           on FEATURE_PRINTING, and the row opens an
+//                           in-Settings fragment, not an external activity.
+//                           Degrades to an empty print-services list.
+//       Traceur           - SAFE. Zero references in packages/apps/Settings;
+//                           its developer-options entry ships inside Traceur.
+//       AppDataBackup     - the Settings row that pointed at
+//                           com.android.appdatabackup was a bare <intent> in
+//                           res/xml/apps.xml and has been deleted.
 
 cc_prebuilt_binary {
     name: "RemovePackagesPeridot",
