@@ -47,7 +47,6 @@ cc_prebuilt_binary {
         "Jellyfish",          // live wallpaper
         "LMOFreeform",        // freeform windowing
         "LMOFreeformSidebar",
-        "LogViewer",
         "OmniJaws",           // weather provider
         "AppDataBackup",
         "ExactCalculator",
@@ -75,5 +74,15 @@ cc_prebuilt_binary {
         //                    removing it means no first-boot flow at all.
         //                    It is rebranded via overlay instead.
         //   Updater        - wanted for BestROM OTA; see vendor/bestrom.
+        //   LogViewer      - Settings res/xml/system_dashboard_fragment.xml:174-178
+        //                    ("View logs") and src/com/android/settings/spa/app/appinfo/
+        //                    AppLogcatPreference.kt (App info > View logs) both launch an
+        //                    intent hard-pinned to app.grapheneos.logviewer
+        //                    (frameworks/base/core/java/android/ext/LogViewerApp.java:50-54),
+        //                    and system_server's error/tombstone notifications target it
+        //                    too (frameworks/base/services/core/java/com/android/server/ext/
+        //                    {SystemErrorNotification,TombstoneHandler,DropBoxMonitor,
+        //                    SystemJournalNotif}.java). Removing it made Settings throw
+        //                    ActivityNotFoundException on tap.
     ],
 }
