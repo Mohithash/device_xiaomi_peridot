@@ -564,6 +564,25 @@ $(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
 # bestrom_peridot.mk. This comment previously claimed MIUI Camera was removed and
 # AOSP Camera2 remained; that was true only while the peridot-miuicamera repos were
 # unsynced, and stopped being true when they were added to the local manifest.
+#
+# MiuiCamera's thumbnail tap (Camera.gotoGallery) first builds
+# com.android.camera.action.REVIEW pinned to com.miui.gallery - or, inside a work
+# profile, to com.google.android.apps.photos - neither of which we ship. The
+# startActivity throws, the app logs "review activity not found!", and retries a
+# plain ACTION_VIEW with setDataAndType(uri, "image/*") (or "video/*"), no package
+# pin and FLAG_GRANT_READ_URI_PERMISSION. Glimpse's ViewActivity is the only
+# ACTION_VIEW handler for image/* + video/* + scheme=content in this ROM, so it
+# takes the intent unambiguously - no chooser. The recurring
+# "MCAM_GalleryUtil: NameNotFoundException: com.miui.gallery" in logcat is that
+# first attempt and is expected. Do not chase it. The com.miui.mediaviewer pin
+# inside the fallback never applies either: the app getPackageInfo()s it first and
+# we do not ship it.
+#
+# One path IS dead: with no photo yet (thumbnail Uri null) both branches of
+# "gotoGallery: no gallery" pin com.miui.gallery (VIEW_EMPTY_PHOTO and ACTION_MAIN)
+# and only Log.e on ActivityNotFoundException, so tapping the empty placeholder
+# does nothing. Fixing that needs a smali patch and a repack of the 186 MB
+# platform-signed vendor blob; not worth it for a pre-first-shot placeholder.
 
 # BestROM: no bundled utilities. Freezer was listed here but neither the APK
 # nor an android_app_import for it ever existed - prebuilt/Android.bp is a

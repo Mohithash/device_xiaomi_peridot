@@ -53,8 +53,19 @@ cc_prebuilt_binary {
         "ExactCalculator",
 
         // Deliberately NOT removed, though they are Voltage extras:
-        //   Aperture       - the only camera app in the tree
-        //   Glimpse        - the only gallery; Aperture opens it by intent
+        //   Glimpse        - the only gallery. MiuiCamera's thumbnail tap pins
+        //                    com.miui.gallery first, misses, and retries a plain
+        //                    ACTION_VIEW image/* that only Glimpse's ViewActivity
+        //                    takes; Glimpse also holds the SYSTEM_GALLERY role
+        //                    (config_systemGallery in packages/apps/Glimpse/
+        //                    rro_overlays/GlimpseFrameworksBaseOverlay).
+        //   (Aperture is no longer listed here: PRODUCT_NO_CAMERA := true in
+        //    bestrom_peridot.mk already keeps it out of the build - see the
+        //    ifneq in vendor/voltage/config/packages.mk. MiuiCamera
+        //    (com.android.camera, from device/xiaomi/peridot-miuicamera/device.mk,
+        //    inherited by our device.mk) is now the ONLY package in the image
+        //    declaring IMAGE_CAPTURE / STILL_IMAGE_CAMERA, so it must never be
+        //    added to this overrides list.)
         //   Seedvault      - the restore path the setup wizard offers
         //   ThemePicker    - backs Settings > Wallpaper & style
         //   ThemesStub
