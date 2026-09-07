@@ -26,6 +26,14 @@ allow hal_camera_default vendor_sysfs_kgsl_proc:file { getattr open read };
 allow hal_camera_default vendor_sysfs_displayfeature:dir search;
 allow hal_camera_default vendor_sysfs_displayfeature:file { open read };
 allow hal_camera_default vendor_sysfs_kgsl:file { getattr open read };
+# /sys/class/kgsl/kgsl-3d0/devfreq is a symlink, and :file does not cover it:
+#   avc: denied { read } name="devfreq" scontext=u:r:hal_camera_default:s0
+#        tcontext=u:object_r:vendor_sysfs_kgsl:s0 tclass=lnk_file
+# r_file_perms rather than bare read, so a follow-on lstat() getattr denial does
+# not cost another flash cycle; same idiom as mi_thermald.te:10 and QTI's
+# thermal-engine.te:69.  The resolved target is already vendor_sysfs_kgsl:file
+# above, and the parent dirs by QTI domain.te:61 / AOSP domain.te:271.
+allow hal_camera_default vendor_sysfs_kgsl:lnk_file r_file_perms;
 allow hal_camera_default vendor_sysfs_battery_supply:dir search;
 allow hal_camera_default vendor_sysfs_battery_supply:file { getattr open read };
 allow hal_camera_default vendor_sysfs_battery_supply:file open;
@@ -59,3 +67,19 @@ add_service(hal_camera_server, hal_camera_aon_service)
 add_service(hal_camera_server, hal_quickcamera_service)
 add_service(hal_camera_server, hal_aidlbgservice_service)
 add_hwservice(hal_camera_server, hal_camera_mivi_hwservice)
+
+# Adreno's app-profile hook (vendor/lib64/libadreno_app_profiles.so, linked into
+# every GL/VK client including the camera provider) probes the retired HIDL name
+# via vendor::qti::qspmhal::V1_0::IQspmhal::tryGetService():
+#   avc: denied { find } interface=vendor.qti.qspmhal::IQspmhal pid=1488
+#        scontext=u:r:hal_camera_default:s0
+#        tcontext=u:object_r:vendor_hal_qspmhal_hwservice:s0
+# peridot ships QSPM as AIDL only, so hwservicemanager would answer "Cannot find
+# entry" even with find granted, and the caller logs the same "Adreno-AppProfiles:
+# Could not find QSPM HAL service. Skipping adreno profile processing."  The find
+# check runs before VINTF resolution, so the grant WOULD be exercised - it just
+# buys nothing and widens the provider's hwservice surface.  QTI dontaudits this
+# same find for appdomain, surfaceflinger, mediacodec, mediaserver, bootanim and
+# gmscore_app; do the same.  Scope stays hal_camera_default - do not widen to the
+# hal_camera attribute, which also covers hal_camera_client.
+dontaudit hal_camera_default vendor_hal_qspmhal_hwservice:hwservice_manager find;

@@ -5,6 +5,11 @@ vendor.audio.voice.receiver.status u:object_r:vendor_audio_prop:s0
 # Camera
 vendor.camera.sensor. u:object_r:vendor_camera_sensor_prop:s0
 vendor.video.scene.recognition u:object_r:vendor_video_mi_prop:s0
+# libmialgo_ie_capture.so sets four persist.vendor.aiie_* debug/tuning props;
+# unlabelled they land on vendor_default_prop, which hal_camera_default may not
+# set.  vendor_camera_prop already has set_prop(hal_camera, ...) from QTI
+# hal_camera.te:37, and set_prop implies get_prop, so the HAL keeps read access.
+persist.vendor.aiie_ u:object_r:vendor_camera_prop:s0
 persist.vendor.EnableP3ColorSpace u:object_r:vendor_camera_p3enable_prop:s0
 persist.vendor.XDRVersion u:object_r:vendor_camera_xdrversion_prop:s0
 
