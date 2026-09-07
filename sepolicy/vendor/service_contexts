@@ -6,6 +6,9 @@ vendor.xiaomi.hardware.quickcamera.IQuickCameraService/default u:object_r:hal_qu
 vendor.xiaomi.hardware.aidlbgservice.IBGService/default           u:object_r:hal_aidlbgservice_service:s0
 vendor.xiaomi.hardware.aon.IAlwaysOn/miaonservicehal           u:object_r:hal_camera_aon_service:s0
 vendor.xiaomi.hardware.camera.synthetic.IVirtualCameraRegistrar/default u:object_r:hal_camera_synthetic_service:s0
+# Absent on peridot; labelled only so MiuiCamera's probe fails cleanly instead
+# of hitting the default_android_service neverallow. See miuicamera.te.
+vendor.xiaomi.hardware.misys.common.IMiSysImpl/default          u:object_r:vendor_hal_misys_service:s0
 
 # Display
 vendor.xiaomi.hardware.displayfeature_aidl.IDisplayFeature/default       u:object_r:vendor_hal_displayfeature_xiaomi_service:s0

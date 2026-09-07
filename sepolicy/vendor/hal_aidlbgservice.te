@@ -12,6 +12,6 @@ allow hal_aidlbgservice system_server:binder { call transfer };
 allow hal_aidlbgservice system_server:fd *;
 add_service(hal_aidlbgservice_server, hal_aidlbgservice_service)
 
-# MiuiCamera (platform_app) looks up IBGService directly (sweep-2200 #6)
-allow { platform_app platform_app_36 } hal_aidlbgservice_service:service_manager find;
-allow { platform_app platform_app_36 } hal_aidlbgservice_server:binder call;
+# MiuiCamera's client rules live in miuicamera.te: platform_app_all covers both
+# platform_app and platform_app_36, and the app needs binder "transfer" (not
+# just "call") to hand the HAL its IEventCallback binder.

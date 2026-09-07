@@ -1,0 +1,154 @@
+# MiuiCamera (com.android.camera) sepolicy.
+#
+# MiuiCamera is platform-signed and installed in /system/priv-app, so
+# seapp_contexts puts it in the platform_app family.  On Android 17 that family
+# is split per targetSdk (system/sepolicy/private/seapp_contexts:191-192:
+# minTargetSdkVersion=37 -> platform_app, otherwise platform_app_36) and
+# MiuiCamera, which targets SDK 35, lands in platform_app_36.  Every rule the
+# device/xiaomi/peridot-miuicamera add-on tree writes against the bare
+# "platform_app" type is therefore dead, and so is QTI's own app<->HAL policy,
+# which is keyed on the versioned public type platform_app_202604.
+#
+# platform_app_all (system/sepolicy/public/attributes:213) covers both domains
+# and any future one.  It is exported to vendor policy as a bare
+# "(typeattribute platform_app_all)" by plat_pub_versioned.cil and bound to
+# (platform_app platform_app_36) by plat_sepolicy.cil, both of which are linked
+# into the same runtime policy - public ATTRIBUTES pass through unversioned,
+# unlike public types.  Rules written against it do bind at runtime.
+#
+# Note this is wider than what the add-on tree originally asked for: every
+# platform-signed app in the ROM, not just MiuiCamera, picks these up.  That is
+# acceptable here because every platform-signed app is ours.
+
+###
+### ROOT CAUSE of the "photo never appears in the gallery" bug.
+###
+# vendor.xiaomi.hardware.aidlbgservice.IBGService/default is registered by
+# /odm/bin/hw/vendor.qti.camera.provider-service_64 (its .rc, line 17), i.e. by
+# hal_camera_default (hal_camera.te:57 hal_server_domain(hal_camera_default,
+# hal_aidlbgservice)).  AidlBGServiceClient.registerCallback() writes the app's
+# IEventCallback binder into the parcel, which the kernel checks as
+# binder { transfer } on the sender (binder_translate_binder ->
+# security_binder_transfer_binder), on top of { call }.  hal_aidlbgservice.te
+# granted only "call", so the transaction failed with DeadObjectException, MIVI
+# post-processing results never came back, and the MediaStore row stayed
+# pending until the next camera launch recovered a thumbnail-sized JPEG.
+#   avc: denied { transfer } scontext=u:r:platform_app_36:s0
+#        tcontext=u:r:hal_camera_default:s0 tclass=binder app=com.android.camera
+# The reverse direction lets the HAL fire that callback with the finished
+# picture and its fds.
+binder_call(platform_app_all, hal_camera_default)
+binder_call(hal_camera_default, platform_app_all)
+
+# MIVI hands the finished frame back over shared memory.  QTI grants exactly
+# this pattern for every other app<->HAL pair on this device (built
+# vendor_sepolicy.cil 9408-9420: platform_app_202604 <-> vendor_hal_perf,
+# vendor_hal_cvp, vendor_hal_scve, hal_fingerprint, ...), but keyed on the
+# versioned type, so it is dead for platform_app_36 too.
+# domain.te:1685 forbids memfd_file *ioctl* only, which we do not grant.
+allow platform_app_all hal_camera_default:memfd_file { read write getattr map };
+allow hal_camera_default platform_app_all:memfd_file { read write getattr map };
+
+# The Xiaomi camera services the app looks up.
+allow platform_app_all {
+    hal_aidlbgservice_service
+    hal_camera_aon_service
+    hal_camera_synthetic_service
+    hal_quickcamera_service
+}:service_manager find;
+
+###
+### MIUI-only HALs that MiuiCamera probes but peridot's odm does not ship.
+###
+# Unlabelled service names fall through to default_android_service, whose
+# neverallow (system/sepolicy/private/domain.te:832,
+# "neverallow * default_android_service:service_manager *") makes ANY allow
+# rule impossible - and servicemanager runs the find check BEFORE lookup, so an
+# unregistered name is denied all the same:
+#   avc: denied { find } name=vendor.xiaomi.hardware.misys.common.IMiSysImpl/default
+#        scontext=u:r:platform_app_36:s0 tcontext=u:object_r:default_android_service:s0
+#        (logcat-events.txt:14)
+# Giving the name a real label lets the find succeed and return null, which the
+# app already handles: "E MiSysProxyV2: Unable to load IMiSysImpl!" (logcat:2001).
+# The matching service_contexts entry is mandatory - checkfc validates
+# service_contexts against the compiled policy, so the two must land together.
+#
+# Not labelled: vendor.xiaomi.hardware.postprocservice.IPostProcService - a label
+# alone changes nothing at runtime and nothing on peridot registers that service
+# (zero hits for "campostproc", "IMiPostProcService" or
+# "hardware.postprocservice" anywhere under vendor/xiaomi/peridot/proprietary),
+# so the allow it would make legal would return null anyway.
+type vendor_hal_misys_service, hal_service_type, protected_service, service_manager_type;
+
+allow platform_app_all vendor_hal_misys_service:service_manager find;
+
+###
+### The rest of the dead add-on rules, restated onto platform_app_all.
+###
+# /data/vendor/camera - MIVI tuning data and hook.db.  Permission sets kept
+# byte-identical to device/xiaomi/peridot-miuicamera/sepolicy/vendor/platform_app.te
+# so nothing is lost on a future re-sync.  Neverallow-clean: every Treble /data
+# neverallow in private/domain.te that could bite subtracts appdomain, and the
+# two that do not (1193, 1206) name the literal type vendor_data_file, which
+# vendor_camera_data_file is not.  The dir write perms are inert in practice -
+# private/mls:106 requires t2 == app_data_file_type / appdomain_tmpfs /
+# l1 eq l2 / mlstrustedsubject / mlstrustedobject for a write, and none holds
+# here - and DAC gates it first anyway.  Kept for upstream parity, not effect.
+allow platform_app_all vendor_camera_data_file:dir { append map r_dir_perms write };
+allow platform_app_all vendor_camera_data_file:file { getattr open read };
+
+# /vendor/dsp - the algo JNI libraries walk the adsprpc firmware directory.
+# private/app.te:340 grants appdomain vendor_file_type:dir r_dir_perms only
+# inside not_full_treble(), which is inactive here; the full_treble_only()
+# branch grants the bare vendor_file type only, and adsprpcd_file is a separate
+# type.  Directory listing only - do NOT add a :file rule, private/domain.te's
+# full_treble_only neverallow on { coredomain } vendor_file_type:file has no
+# -appdomain exemption and platform_app_36 is coredomain.
+allow platform_app_all adsprpcd_file:dir { open read search };
+
+# /proc/pressure/{memory,cpu,io} - MIUI's CAM-Work-1-thre samples PSI to
+# throttle capture and post-processing.  Same three files hal_camera.te:12-17
+# already grants to hal_camera_default.  Denied twice per session in the
+# build-1054 capture (logcat:1747,1768,1769 and 7218-7220).
+allow platform_app_all proc_pressure_cpu:file { getattr open read };
+allow platform_app_all proc_pressure_io:file { getattr open read };
+allow platform_app_all proc_pressure_mem:file { getattr open read };
+
+# Properties read while the camera starts up.  vendor_displayfeature_prop,
+# vendor_camera_sensor_prop, vendor_camera_p3enable_prop and
+# vendor_panel_info_prop are vendor_public_prop (property.te:2-5);
+# vendor_audio_prop is vendor_restricted_prop
+# (device/qcom/sepolicy_vndr/sm8650/generic/vendor/common/property.te:46).
+# Both classes are subtracted from the coredomain neverallow in
+# private/property.te:199-205.  The first four were denied at launch
+# (logcat:275,387,1070,1109); vendor_panel_info_prop is add-on parity.
+#
+# Not restated: vendor_display_prop, already granted to every app by
+# device/qcom/sepolicy_vndr/sm8650/generic/vendor/common/app.te:39
+# "get_prop(appdomain, vendor_display_prop)", which is why the dead add-on rule
+# for it produced no denial.  Also not restated: vendor_camera_xdrversion_prop
+# (maps only to persist.vendor.XDRVersion, which appears nowhere in the APK -
+# the only XDRVersion string in the dex is the CameraMetadata vendor-tag key
+# "xiaomi.snapshot.XDRVersion") and vendor_video_mi_prop (maps only to
+# vendor.video.scene.recognition, zero hits in the dex and in the bundled libs).
+get_prop(platform_app_all, vendor_audio_prop)
+get_prop(platform_app_all, vendor_camera_p3enable_prop)
+get_prop(platform_app_all, vendor_camera_sensor_prop)
+get_prop(platform_app_all, vendor_displayfeature_prop)
+get_prop(platform_app_all, vendor_panel_info_prop)
+
+# Deliberately NOT ported from the add-on tree's platform_app.te:
+#   allow platform_app app_data_file:file execute;
+# It compiles (the W^X neverallows in private/app_neverallows.te:66-73 are
+# scoped to all_untrusted_apps), but restating it on platform_app_all hands a
+# W^X exemption over /data/data to EVERY platform-signed app in the ROM, and
+# MiuiCamera ships Firebase Crashlytics plus a self-update downloader.  No
+# "denied { execute } ... tcontext=...app_data_file" appears anywhere in the
+# build-1054 capture, which covered a complete camera session with the rule
+# already dead.  Add it only if a real denial shows up on device.
+#
+# Also deliberately absent: camera_persist_file / mnt_vendor_file for the app.
+# MIVILutSaver's "Failed to write test data to persist dir" is expected - the
+# write is MLS-denied by private/mls:106 whatever type enforcement says, the
+# failure path posts a no-op Handler message, and the add-on tree never had
+# such a rule either.
