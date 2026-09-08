@@ -22,4 +22,9 @@
     <bool name="def_charging_sounds_enabled">false</bool>
     <!-- Charging vibration -> Settings.Secure.CHARGING_VIBRATION_ENABLED -->
     <bool name="def_charging_vibration_enabled">false</bool>
+
+    <!-- BestROM: pure black dark theme out of the box. peridot is OLED, so a black
+         page costs no backlight where a #121212 one does. Still a switch under
+         Settings > Display > Dark theme; this is only the first-boot value. -->
+    <bool name="def_berry_black_theme">true</bool>
 </resources>

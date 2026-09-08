@@ -15,6 +15,37 @@
     <bool name="config_enableAppLaunchBlur">false</bool>
     <bool name="config_enableBlurExpansion">false</bool>
 
+    <!-- BestROM typography. Space Grotesk reads, Doto is glanced at.
+         These are the platform defaults, not a lock: the Settings font picker's
+         overlays are mutable and unconfigured, so OverlayConfig hands them
+         DEFAULT_PRIORITY (Integer.MAX_VALUE) and OverlayManagerSettings.insert puts
+         them after this static priority-100 overlay, i.e. above it. Picking a font in
+         Settings still wins; picking none comes back here.
+         config_clockFontFamily deliberately lives here rather than in a font overlay -
+         none of the fifteen stock font overlays sets it, so the dot-matrix clock
+         survives a change of body font instead of silently reverting. The two fonts
+         are installed to /product/fonts and declared as named families in
+         /product/etc/fonts_customization.xml. -->
+    <string name="config_bodyFontFamily" translatable="false">space-grotesk</string>
+    <string name="config_bodyFontFamilyMedium" translatable="false">space-grotesk-medium</string>
+    <string name="config_headlineFontFamily" translatable="false">space-grotesk</string>
+    <string name="config_headlineFontFamilyMedium" translatable="false">space-grotesk-medium</string>
+    <string name="config_clockFontFamily" translatable="false">doto</string>
+
+    <!-- BestROM: monochrome is also the style the setup wizard seeds. Without this
+         the SystemUI default is quietly undone on a clean flash: when
+         hardwareColorStyles() is on and the user is not yet provisioned,
+         ThemeOverlayController.start() reads this array, assigns
+         mThemeStyle = defaultSettings.style and then WRITES that style into
+         Settings.Secure.THEME_CUSTOMIZATION_OVERLAY_PACKAGES, which from then on
+         outranks the compiled-in default for the life of the install. AOSP's only
+         entry is the wildcard "*|TONAL_SPOT|home_wallpaper"; peridot has no
+         ro.boot.hardware.color variants to enumerate, so the wildcard is the whole
+         array. Seed colour source is unchanged - still the home wallpaper. -->
+    <string-array name="theming_defaults" translatable="false">
+        <item>*|MONOCHROMATIC|home_wallpaper</item>
+    </string-array>
+
     <!-- BestROM: vibration off out of the box. 0 = Vibrator.VIBRATION_INTENSITY_OFF.
          Runtime fallbacks: VibrationSettings.updateSettings loads each
          Settings.System.*_VIBRATION_INTENSITY with -1 and falls back here, so they
