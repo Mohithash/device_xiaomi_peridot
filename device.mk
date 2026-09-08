@@ -598,3 +598,20 @@ $(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
 # image is assembled - a Soong prebuilt at the same path loses the install
 # collision.
 BESTROM_BOOTANIMATION := device/xiaomi/peridot/prebuilt/bootanimation/bootanimation.zip
+
+# Shutdown screen. SystemUI draws the shutdown spinner here
+# (config_showSysuiShutdown is true, so ShutdownThread hands the UI to
+# SystemUI). Once the framework hands over, init SIGTERMs systemui and
+# surfaceflinger together, and the panel simply keeps scanning out the last
+# frame that was composed - a spinner caught mid-turn - for the rest of init's
+# work (vold, sync, umount /data) until the kernel powers the display down.
+# ro.init.shutdown_animation is the mechanism built for that window: init keeps
+# surfaceflinger and bootanimation out of the stop list, marks them shutdown
+# critical and restarts bootanimation in shutdown mode, so a live surface owns
+# the screen until the reboot call. The animation is one black frame on an
+# endless part, which is what should be on screen at that point anyway.
+PRODUCT_COPY_FILES += \
+    device/xiaomi/peridot/prebuilt/bootanimation/shutdownanimation.zip:$(TARGET_COPY_OUT_PRODUCT)/media/shutdownanimation.zip
+
+PRODUCT_SYSTEM_PROPERTIES += \
+    ro.init.shutdown_animation=true

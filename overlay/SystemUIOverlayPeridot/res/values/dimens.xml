@@ -28,4 +28,10 @@
          the lock screen; the design asks for 24 in the shade and 20 on the lock screen,
          so take the shade number. -->
     <dimen name="notification_corner_radius">24dp</dimen>
+
+    <!-- BestROM: the shutdown screen is a ScrimDrawable painted at this alpha
+         over whatever was on screen, so at 0.95 five per cent of the launcher
+         or the last app keeps compositing through it for the whole shutdown.
+         Make it opaque. TvSystemUI already ships 1.0. -->
+    <item name="shutdown_scrim_behind_alpha" format="float" type="dimen">1.0</item>
 </resources>
