@@ -89,7 +89,6 @@ cc_prebuilt_binary {
         // common.mk:267 includes packages.mk unconditionally.
         "Covers",             // cover-screen UI; peridot is not a foldable
         "Etar",               // calendar
-        "GameSpace",          // game mode overlay
         "Gramophone",         // music player
         "Jellyfish",          // live wallpaper
         "LMOFreeform",        // freeform windowing
