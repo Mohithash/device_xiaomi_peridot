@@ -133,7 +133,7 @@ TARGET_KERNEL_CONFIG := \
 
 BOARD_KERNEL_CMDLINE := \
     sysctl.kernel.firmware_config.force_sysfs_fallback=1 \
-    mtdoops.fingerprint=peridot:$(VOLTAGEVERSION)-$(VOLTAGE_BUILD_DATE)
+    mtdoops.fingerprint=peridot:$(BESTROM_VERSION)-$(VOLTAGE_BUILD_DATE)
 
 BOARD_BOOTCONFIG := \
     androidboot.hardware=qcom \
