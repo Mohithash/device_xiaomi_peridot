@@ -7,6 +7,14 @@
     <!-- BestROM: keep far more call history per SIM than the 500-entry default. -->
     <integer name="config_maximumCallLogEntriesPerSim">10000</integer>
 
+    <!-- BestROM: no window blur. Pairs with TARGET_ENABLE_BLUR := false in
+         bestrom_peridot.mk, which clears ro.surface_flinger.supports_background_blur.
+         These two bools are the framework-side gates for the app-launch blur and the
+         shade-expansion blur; leaving them true would keep asking for a blur the
+         compositor no longer supports. -->
+    <bool name="config_enableAppLaunchBlur">false</bool>
+    <bool name="config_enableBlurExpansion">false</bool>
+
     <!-- BestROM: vibration off out of the box. 0 = Vibrator.VIBRATION_INTENSITY_OFF.
          Runtime fallbacks: VibrationSettings.updateSettings loads each
          Settings.System.*_VIBRATION_INTENSITY with -1 and falls back here, so they

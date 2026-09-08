@@ -20,6 +20,15 @@ VOLTAGE_BUILD := peridot
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
+# No window blur. vendor/voltage/config/common.mk:74 has TARGET_ENABLE_BLUR ?= true
+# and evaluates it at inherit time, so this has to be set before the inherit
+# below - branding.mk is inherited too late to win, and the properties cannot
+# be re-declared there either (gen_build_prop.py rejects duplicate sysprop
+# assignments outright). Turning it off drops a full-screen multi-tap GPU
+# downsample/upsample pass on every shade expansion and app launch, and stops
+# SurfaceFlinger advertising background-blur support at all.
+TARGET_ENABLE_BLUR := false
+
 # Inherit some common VoltageOS stuff.
 # NOTE: choosing common_mobile over common_full_phone does NOT make the build
 # minimal, contrary to what this comment used to claim. common_mobile.mk:2
