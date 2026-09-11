@@ -247,6 +247,14 @@ TARGET_SYSTEM_PROP += $(DEVICE_PATH)/props/system.prop
 TARGET_SYSTEM_EXT_PROP += $(DEVICE_PATH)/props/system_ext.prop
 TARGET_VENDOR_PROP += $(DEVICE_PATH)/props/vendor.prop
 
+# Lineage Health HAL (Settings → Battery → Charging speed). Must live in
+# BoardConfig so Soong sees it when compiling vendor.lineage.health-service.
+$(call soong_config_set_bool,lineage_health,charging_control_supports_bypass,false)
+$(call soong_config_set,lineage_health,fast_charge_node,/sys/class/qcom-battery/fastcharge_enable)
+$(call soong_config_set,lineage_health,fast_charge_value_none,0)
+$(call soong_config_set,lineage_health,fast_charge_value_fast_charge,1)
+$(call soong_config_set,lineage_health,fast_charge_value_super_fast_charge,2)
+
 # Recovery
 $(call soong_config_set, ufsbsg, ufsframework, bsg)
 BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
