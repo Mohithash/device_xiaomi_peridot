@@ -382,7 +382,7 @@ on property:sys.boot_completed=1
     write /sys/class/thermal/thermal_message/boot_complete 2
 
     # Clear suspend / charge-limit only. Fast-charge mode is owned by
-    # vendor.lineage.health (Settings → Battery → Charging speed). Default
+    # the BestROM health HAL (Settings → Battery → Charging speed). Default
     # there is Fast (smart_chg, no sport), not Super.
     write /sys/class/qcom-battery/input_suspend 0
     write /sys/class/power_supply/battery/charge_control_limit 0

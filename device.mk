@@ -274,7 +274,7 @@ PRODUCT_COPY_FILES += \
 # vendor.lineage.health). Without it, init had to pin fastcharge_enable alone
 # and could not expose a user-facing safe default.
 PRODUCT_PACKAGES += \
-    vendor.lineage.health-service.default
+    vendor.bestrom.health-service.default
 
 $(call soong_config_set_bool,lineage_health,charging_control_supports_bypass,false)
 $(call soong_config_set,lineage_health,fast_charge_node,/sys/class/qcom-battery/fastcharge_enable)
