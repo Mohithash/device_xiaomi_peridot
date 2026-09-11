@@ -11,6 +11,12 @@ on early-boot
     mkdir /data/vendor/modem 0777 root root
     mkdir /data/vendor/modem/diag_logs 0777 root root
 
+    # Optical UDFPS. Dirty flashes can leave persist.vendor.fingerprint.type=udfps
+    # (ultrasonic) from older trees; that arms a full-screen keyguard overlay and
+    # rubber-bands swipe-to-bouncer. Force the optical values before the HAL starts.
+    setprop persist.vendor.fingerprint.type udfps_optical
+    setprop persist.vendor.fingerprint.sensor_location 610|2437|105
+
     # Enable WLAN cold boot calibration
     write /sys/kernel/cnss/fs_ready 1
 
@@ -140,9 +146,11 @@ on boot
     chown system system /sys/class/thermal/thermal_message/board_sensor_temp_comp
     chown system system /sys/class/thermal/thermal_message/cpu_nolimit_temp
 
-    # Set thermal mode to mgame
-    write /sys/devices/virtual/thermal/thermal_message/sconfig 19
-    
+    # Default thermal profile (0). Boot used to force mgame (19), which keeps
+    # gaming charge/CPU limits even when idle and feels like "slow charging".
+    # Power profile tile can raise this later (performance/gaming).
+    write /sys/devices/virtual/thermal/thermal_message/sconfig 0
+
     # Xiaomi touch
     chown system system /dev/xiaomi-touch
     chmod 0660 /dev/xiaomi-touch
@@ -216,6 +224,11 @@ on charger
     write /sys/bus/platform/devices/1d84000.ufshc/clkscale_enable 1
     write /sys/bus/platform/devices/1d84000.ufshc/auto_hibern8 5000
     write /sys/bus/platform/devices/1d84000.ufshc/clkgate_enable 1
+    # Early plug: unlock input and enable *smart* fast charge (sysfs 1).
+    # Sport/super-fast (2) is hotter; Health Settings owns that choice after boot.
+    write /sys/class/qcom-battery/input_suspend 0
+    write /sys/class/power_supply/battery/charge_control_limit 0
+    write /sys/class/qcom-battery/fastcharge_enable 1
 
 on init
     chmod 0666 /dev/uhid
@@ -363,6 +376,17 @@ on property:vendor.post_boot.parsed=1
 
 
 on property:sys.boot_completed=1
+    # Leave mi_thermald boot throttle; without this, charge FCC stays capped
+    # after boot even when the phone is idle (Lineage keeps the same write).
+    wait /sys/class/thermal/thermal_message/boot_complete
+    write /sys/class/thermal/thermal_message/boot_complete 2
+
+    # Clear suspend / charge-limit only. Fast-charge mode is owned by
+    # vendor.lineage.health (Settings → Battery → Charging speed). Default
+    # there is Fast (smart_chg, no sport), not Super.
+    write /sys/class/qcom-battery/input_suspend 0
+    write /sys/class/power_supply/battery/charge_control_limit 0
+
     # KGSL
     chown system system /sys/class/kgsl/kgsl-3d0/devfreq/max_freq
     chown system system /sys/class/kgsl/kgsl-3d0/devfreq/min_freq
@@ -454,6 +478,12 @@ service qrtr-lookup /vendor/bin/qrtr-lookup
     group system
     disabled
     oneshot
+
+# batterysecret starts on boot_completed / charger and can race early writes.
+# Only clear suspend / limit — do not override the Health-selected charge mode.
+on property:init.svc.batterysecret=running
+    write /sys/class/qcom-battery/input_suspend 0
+    write /sys/class/power_supply/battery/charge_control_limit 0
 
 service vendor.nv_mac /vendor/bin/nv_mac
     class late_start
