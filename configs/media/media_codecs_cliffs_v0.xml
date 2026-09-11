@@ -106,7 +106,9 @@
 
 <MediaCodecs>
     <Include href="media_codecs_c2_audio.xml" />
-    <Include href="media_codecs_dolby_audio.xml" />
+    <!-- BestROM: media_codecs_dolby_audio.xml (c2.dolby.eac3 / ac4) needs the
+         Dolby C2 store (default1). That HAL SIGSEGVs on boot, so do not
+         advertise the decoders. Dolby Vision remains via c2.qti.dv.*. -->
     <Settings>
         <Setting name="max-video-encoder-input-buffers" value="11" />
     </Settings>

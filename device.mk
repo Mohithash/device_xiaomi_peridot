@@ -234,6 +234,7 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     init.qcom.factory.rc \
     init.peridot.rc \
+    init.bestrom.dolby-c2.rc \
     init.qcom.rc \
     init.recovery.qcom.rc \
     init.target.rc
@@ -280,7 +281,6 @@ $(call soong_config_set,lineage_health,fast_charge_node,/sys/class/qcom-battery/
 $(call soong_config_set,lineage_health,fast_charge_value_none,0)
 $(call soong_config_set,lineage_health,fast_charge_value_fast_charge,1)
 $(call soong_config_set,lineage_health,fast_charge_value_super_fast_charge,2)
-
 
 # BestROM: XiaomiParts (org.lineageos.settings) removed - ultra-minimal build.
 
@@ -563,6 +563,28 @@ PRODUCT_COPY_FILES += \
 # Vendor
 $(call inherit-product, vendor/xiaomi/peridot/peridot-vendor.mk)
 $(call inherit-product-if-exists, device/xiaomi/peridot-miuicamera/device.mk)
+
+# BestROM: replace the stock Codec2 VINTF fragment so IComponentStore/default1
+# (Dolby C2) is not advertised. The matching service is disabled by
+# init.bestrom.dolby-c2.rc. Must come after peridot-vendor.mk.
+PRODUCT_PACKAGES := $(filter-out c2_manifest_vendor.xml,$(PRODUCT_PACKAGES))
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/media/c2_manifest_vendor.xml:$(TARGET_COPY_OUT_VENDOR)/etc/vintf/manifest/c2_manifest_vendor.xml
+
+# BestROM: the stock init rc and the pdx245 Dolby C2 binary still ship from
+# peridot-vendor.mk. init.bestrom.dolby-c2.rc overrides with `disabled`, but
+# mediacodeclist_generator still hits a null IConfigurable when that HAL is
+# probed (SIGSEGV in Codec2ConfigurableClient::HidlImpl). Remove the binary
+# and the stock rc so nothing can start or advertise it. Keep Atmos/DMS and
+# QTI Dolby Vision (c2.qti.dv.*). media_codecs_cliffs_v0.xml already omits
+# media_codecs_dolby_audio.xml; drop the orphan XML too.
+PRODUCT_PACKAGES := $(filter-out \
+    vendor.dolby.media.c2@1.0-service \
+    ,$(PRODUCT_PACKAGES))
+PRODUCT_COPY_FILES := $(filter-out \
+    %/vendor.dolby.media.c2@1.0-service.rc \
+    %/media_codecs_dolby_audio.xml \
+    ,$(PRODUCT_COPY_FILES))
 
 # BestROM: GameBar removed (44 MB system_ext priv-app + init.gamebar.rc + sepolicy).
 

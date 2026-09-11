@@ -1,0 +1,12 @@
+# BestROM: disable vendor.dolby.media.c2@1.0-service.
+# The pdx245 service binary SIGSEGVs (null IConfigurable in
+# Codec2ConfigurableClient::HidlImpl / mediacodeclist_generator). device.mk
+# also filters the binary and the stock init rc out of the image; this file
+# is the belt if a stale rc remains. Dolby Vision stays on c2.qti.dv.*; Atmos
+# is vendor.dolby.hardware.dms (separate).
+service vendor-dolby-media-c2-hal-1-0 /vendor/bin/hw/vendor.dolby.media.c2@1.0-service
+    override
+    disabled
+    class hal
+    user mediacodec
+    group camera mediadrm drmrpc
