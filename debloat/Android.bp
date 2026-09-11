@@ -47,14 +47,24 @@
 //                           getIntent() resolveActivity()s and
 //                           getAvailabilityStatus() returns
 //                           UNSUPPORTED_ON_DEVICE. Row disappears.
-//       EmergencyInfo     - GUARDED. EmergencyInfoPreferenceController.java
-//                           queryIntentActivities, returns
-//                           UNSUPPORTED_ON_DEVICE.
-//       PrintSpooler / BuiltInPrintService / PrintRecommendationService
-//                         - SAFE. PrintSettingPreferenceController.java gates
-//                           on FEATURE_PRINTING, and the row opens an
-//                           in-Settings fragment, not an external activity.
-//                           Degrades to an empty print-services list.
+//       EmergencyInfo     - NOT removed. Settings > Safety & emergency resumes
+//                           EmergencyGestureEntrypointPreferenceController,
+//                           which calls EmergencyNumberUtils.getEmergencyGesture
+//                           Enabled() -> ContentResolver.call on authority
+//                           com.android.emergency.gesture (provided only by
+//                           EmergencyInfo). Missing authority throws
+//                           IllegalArgumentException and kills SubSettings.
+//                           EmergencyInfoPreferenceController is guarded; the
+//                           gesture entrypoint summary path is not.
+//       PrintSpooler      - NOT removed. PrintManagerService still binds to
+//                           com.android.printspooler via RemotePrintSpooler;
+//                           without the APK, bindLocked waits
+//                           BIND_SPOOLER_SERVICE_TIMEOUT (10s user) on
+//                           android.bg for every removeObsoletePrintJobs /
+//                           similar call and stalls system_server under load.
+//       BuiltInPrintService / PrintRecommendationService
+//                         - SAFE. Optional print backends; Settings gates on
+//                           FEATURE_PRINTING and degrades to an empty list.
 //       Traceur           - SAFE. Zero references in packages/apps/Settings;
 //                           its developer-options entry ships inside Traceur.
 //       AppDataBackup     - the Settings row that pointed at
@@ -76,9 +86,7 @@ cc_prebuilt_binary {
         "BuiltInPrintService",
         "DeviceAsWebcam",
         "DeviceDiagnostics",
-        "EmergencyInfo",
         "PrintRecommendationService",
-        "PrintSpooler",
         "QuickSearchBox",
         "SimAppDialog",
         "Traceur",
