@@ -1,9 +1,15 @@
 //
 // SPDX-FileCopyrightText: The LineageOS Project
+// SPDX-FileCopyrightText: BestROM
 // SPDX-License-Identifier: Apache-2.0
+//
+// Must be product_specific: NavigationBarModeGesturalOverlay is also product,
+// and product RROs win over vendor RROs for the same android resource. A vendor
+// FrameworkOverlayPeridot with priority 100 still lost to gestural's 30dp
+// (90px on peridot), which pilfers Telegram/WhatsApp swipe-to-reply.
 //
 
 runtime_resource_overlay {
     name: "FrameworkOverlayPeridot",
-    vendor: true,
+    product_specific: true,
 }
