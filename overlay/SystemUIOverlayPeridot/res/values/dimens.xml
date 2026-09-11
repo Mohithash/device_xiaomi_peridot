@@ -4,11 +4,23 @@
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources>
-    <dimen name="keyguard_indication_margin_bottom">145dp</dimen>
+    <!-- Sit above the 280dp UDFPS recognizing animation around the optical
+         sensor (y≈2437). 96dp still overlapped the art; 160dp clears it while
+         leaving the PIN bouncer reachable without a hard scroll. -->
+    <dimen name="keyguard_indication_margin_bottom">160dp</dimen>
+
+    <!-- Slightly smaller than Voltage's 280dp default so the recognizing
+         animation does not climb as far into the indication area. -->
+    <dimen name="udfps_animation_size">200dp</dimen>
+    <dimen name="udfps_animation_offset">0dp</dimen>
 
     <!-- Location on the screen of the center of the physical power button. This is a reasonable
     default that should be overridden by device-specific overlays. -->
     <dimen name="physical_power_button_center_screen_location_y">1210px</dimen>
+
+    <!-- Fallback when AuthController has no HAL UDFPS bounds yet. AOSP default
+         is 610px (rear-FPS placeholder); peridot sensor is at y=2437. -->
+    <dimen name="physical_fingerprint_sensor_center_screen_location_y">2437px</dimen>
 
     <!-- Microns/ums (1000 um = 1mm) per pixel for the given device. If unspecified, UI that
          relies on this value will not be sized correctly. -->
