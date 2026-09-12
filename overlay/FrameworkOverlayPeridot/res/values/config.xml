@@ -552,15 +552,16 @@
         <item>105</item>
     </integer-array>
 
-    <!-- Gestural nav ships 30dp (~90px on peridot) and SystemUI pilfers the
-         stroke after touch_slop — chat swipe-to-reply never reaches the app.
-         8dp (~24px) keeps back usable. This overlay must stay product_specific
-         so it beats NavigationBarModeGesturalOverlay (also product). -->
-    <dimen name="config_backGestureInset">8dp</dimen>
+    <!-- Gestural nav default is ~24–30dp and SystemUI pilfers chat swipe-to-reply.
+         8dp was too narrow: back from the upper corners often failed when Edge
+         TOP also saw the DOWN. 16dp keeps back reliable; chat swipe still works
+         because Edge LEFT/RIGHT always passthrough. Overlay must stay
+         product_specific so it beats NavigationBarModeGesturalOverlay. -->
+    <dimen name="config_backGestureInset">16dp</dimen>
     <array name="config_backGestureInsetScales">
-        <item>0.50</item>
         <item>0.75</item>
         <item>1.00</item>
+        <item>1.25</item>
     </array>
 
     <!-- Control whether the always on display mode is available. This should only be enabled on
