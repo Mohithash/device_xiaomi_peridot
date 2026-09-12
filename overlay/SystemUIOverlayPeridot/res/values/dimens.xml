@@ -35,6 +35,10 @@
          NOTE: qs_corner_radius (28dp) is NOT the tile radius in A17 - it is only the
          top radius of qs_footer_actions_background - so it is deliberately left alone. -->
     <dimen name="common_tile_default_active_tile_corner_radius">36dp</dimen>
+    <!-- Match inactive tile + icon radii so on/off look identical (Nothing-like pills). -->
+    <dimen name="common_tile_default_inactive_tile_corner_radius">36dp</dimen>
+    <dimen name="common_tile_default_active_icon_corner_radius">36dp</dimen>
+    <dimen name="common_tile_default_inactive_icon_corner_radius">36dp</dimen>
 
     <!-- BestROM: notification card radius. The platform has one value for the shade and
          the lock screen; the design asks for 24 in the shade and 20 on the lock screen,
